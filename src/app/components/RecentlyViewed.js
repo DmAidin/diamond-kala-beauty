@@ -19,7 +19,7 @@ export function trackProductView(product) {
       _id: id,
       name: product.name,
       price: product.price,
-      image: product.image,
+      image: product.images?.[0] || product.image,
       brand: product.brand,
       category: product.category,
       stock: product.stock,

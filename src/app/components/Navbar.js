@@ -32,9 +32,9 @@ export default function Navbar() {
     <header className="sticky top-0 z-50 bg-base/95 backdrop-blur border-b border-base-line">
       <div className="trace-line" />
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
-        <div className="flex items-center gap-4 h-16">
+        <div className="flex items-center gap-4 h-24">
           <Link href="/" className="flex items-center gap-2 shrink-0">
-            <img src="/logo.png" alt="دایموند کالا" className="w-9 h-9 object-contain" />
+            <img src="/logo.png" alt="دایموند کالا" className="w-16 h-16 object-contain" />
             <span className="font-display text-lg tracking-wide text-ink hidden sm:inline">
               دایموند کالا
             </span>

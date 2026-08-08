@@ -43,6 +43,10 @@ async function nextOrderNumber() {
   return `DK-${y}${m}${d}-${String(counter.seq).padStart(4, "0")}`;
 }
 
+// courier delivery flat fee, in Toman — enforced server-side so a client
+// can never submit a discounted or missing shipping charge
+const COURIER_FEE = 200000;
+
 // POST: create a new pending order from the client-side cart.
 // Coupon is re-validated here server-side so a tampered client can't grant itself a discount.
 // Stock is checked (not yet deducted — that happens once payment is verified).
@@ -54,7 +58,8 @@ export async function POST(request) {
 
   try {
     const body = await request.json();
-    const { items, receiver, couponCode } = body;
+    const { items, receiver, couponCode, deliveryMethod } = body;
+    const method = deliveryMethod === "pickup" ? "pickup" : "courier";
 
     if (!Array.isArray(items) || items.length === 0) {
       return new Response(JSON.stringify({ error: "سبد خرید خالی است" }), { status: 400 });
@@ -78,6 +83,7 @@ export async function POST(request) {
     }
 
     const subtotal = items.reduce((sum, i) => sum + i.price * i.quantity, 0);
+    const shippingCost = method === "courier" ? COURIER_FEE : 0;
     let discount = 0;
     let appliedCode = "";
 
@@ -94,7 +100,7 @@ export async function POST(request) {
       }
     }
 
-    const totalPrice = Math.max(subtotal - discount, 0);
+    const totalPrice = Math.max(subtotal - discount, 0) + shippingCost;
     const orderNumber = await nextOrderNumber();
 
     const order = await Order.create({
@@ -108,6 +114,8 @@ export async function POST(request) {
       })),
       subtotal,
       discount,
+      deliveryMethod: method,
+      shippingCost,
       totalPrice,
       couponCode: appliedCode,
       receiver,

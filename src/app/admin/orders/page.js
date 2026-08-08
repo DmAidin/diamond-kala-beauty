@@ -82,6 +82,14 @@ export default function AdminOrdersPage() {
                     <span className="text-ink">{(item.price * item.quantity).toLocaleString()} تومان</span>
                   </div>
                 ))}
+                <div className="spec-row">
+                  <span className="text-ink-muted">روش تحویل</span>
+                  <span className="text-ink">{o.deliveryMethod === "pickup" ? "تحویل حضوری" : "ارسال با پیک"}</span>
+                </div>
+                <div className="spec-row">
+                  <span className="text-ink-muted">هزینه ارسال</span>
+                  <span className="text-ink">{o.shippingCost > 0 ? `${o.shippingCost.toLocaleString()} تومان` : "رایگان"}</span>
+                </div>
               </div>
 
               <div className="bg-base border border-base-line rounded-sm px-4 mb-4">

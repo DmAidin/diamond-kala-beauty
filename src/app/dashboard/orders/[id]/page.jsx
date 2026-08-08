@@ -62,6 +62,16 @@ export default function OrderDetailPage({ params }) {
               <span className="font-mono">−{order.discount.toLocaleString()}</span>
             </div>
           )}
+          <div className="flex justify-between text-ink-muted">
+            <span>روش تحویل</span>
+            <span>{order.deliveryMethod === "pickup" ? "تحویل حضوری" : "ارسال با پیک"}</span>
+          </div>
+          <div className="flex justify-between text-ink-muted">
+            <span>هزینه ارسال</span>
+            <span className="font-mono">
+              {order.shippingCost > 0 ? order.shippingCost.toLocaleString() : "رایگان"}
+            </span>
+          </div>
           <div className="flex justify-between text-ink font-semibold">
             <span>مبلغ نهایی</span>
             <span className="font-mono text-gold">{order.totalPrice.toLocaleString()} تومان</span>

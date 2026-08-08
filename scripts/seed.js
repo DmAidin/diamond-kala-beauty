@@ -7,7 +7,7 @@ const ProductSchema = new mongoose.Schema(
   {
     name: String,
     price: Number,
-    image: String,
+    images: [String],
     description: String,
     category: String,
     brand: String,
@@ -22,7 +22,7 @@ const products = [
   {
     name: "سرم ویتامین C روشن‌کننده پوست",
     price: 890000,
-    image: "https://placehold.co/400x400/F7EDE7/C592A8?text=Serum",
+    images: ["https://placehold.co/400x400/F7EDE7/C592A8?text=Serum"],
     category: "مراقبت پوست",
     brand: "لومینا",
     stock: 22,
@@ -32,7 +32,7 @@ const products = [
   {
     name: "کرم مرطوب‌کننده هیالورونیک اسید",
     price: 650000,
-    image: "https://placehold.co/400x400/F7EDE7/C592A8?text=Cream",
+    images: ["https://placehold.co/400x400/F7EDE7/C592A8?text=Cream"],
     category: "مراقبت پوست",
     brand: "هیدرا لوکس",
     stock: 30,
@@ -42,7 +42,7 @@ const products = [
   {
     name: "رژ لب مات ماندگار",
     price: 320000,
-    image: "https://placehold.co/400x400/F7EDE7/C592A8?text=Lipstick",
+    images: ["https://placehold.co/400x400/F7EDE7/C592A8?text=Lipstick"],
     category: "آرایش",
     brand: "وستا بیوتی",
     stock: 40,
@@ -52,7 +52,7 @@ const products = [
   {
     name: "پالت سایه چشم ۱۲ رنگ",
     price: 780000,
-    image: "https://placehold.co/400x400/F7EDE7/C592A8?text=Palette",
+    images: ["https://placehold.co/400x400/F7EDE7/C592A8?text=Palette"],
     category: "آرایش",
     brand: "وستا بیوتی",
     stock: 18,
@@ -62,7 +62,7 @@ const products = [
   {
     name: "شامپو تقویت‌کننده مو با روغن آرگان",
     price: 410000,
-    image: "https://placehold.co/400x400/F7EDE7/C592A8?text=Shampoo",
+    images: ["https://placehold.co/400x400/F7EDE7/C592A8?text=Shampoo"],
     category: "مراقبت مو",
     brand: "آرگانیکا",
     stock: 35,
@@ -72,7 +72,7 @@ const products = [
   {
     name: "ماسک مو کراتینه احیاکننده",
     price: 520000,
-    image: "https://placehold.co/400x400/F7EDE7/C592A8?text=Hair+Mask",
+    images: ["https://placehold.co/400x400/F7EDE7/C592A8?text=Hair+Mask"],
     category: "مراقبت مو",
     brand: "آرگانیکا",
     stock: 20,
@@ -82,7 +82,7 @@ const products = [
   {
     name: "ادکلن گلد ادوپرفیوم زنانه",
     price: 1450000,
-    image: "https://placehold.co/400x400/F7EDE7/C592A8?text=Perfume",
+    images: ["https://placehold.co/400x400/F7EDE7/C592A8?text=Perfume"],
     category: "عطر و ادکلن",
     brand: "پرل پرفیوم",
     stock: 12,
@@ -92,7 +92,7 @@ const products = [
   {
     name: "ست مسواک و خمیردندان سفیدکننده",
     price: 280000,
-    image: "https://placehold.co/400x400/F7EDE7/C592A8?text=Oral+Care",
+    images: ["https://placehold.co/400x400/F7EDE7/C592A8?text=Oral+Care"],
     category: "بهداشت شخصی",
     brand: "دنتاکر",
     stock: 45,

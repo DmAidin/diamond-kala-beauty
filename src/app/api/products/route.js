@@ -28,7 +28,7 @@ export async function POST(request) {
     await connectToDB();
     const body = await request.json();
 
-    if (!body.name || body.price === undefined || isNaN(body.price) || !body.image) {
+    if (!body.name || body.price === undefined || isNaN(body.price) || !Array.isArray(body.images) || body.images.length === 0) {
       return new Response(JSON.stringify({ error: "نام، قیمت و آدرس تصویر محصول الزامی است" }), {
         status: 400,
         headers: { "Content-Type": "application/json" },
@@ -72,7 +72,7 @@ export async function PUT(request) {
 
     const body = await request.json();
 
-    if (!body.name || body.price === undefined || isNaN(body.price) || !body.image) {
+    if (!body.name || body.price === undefined || isNaN(body.price) || !Array.isArray(body.images) || body.images.length === 0) {
       return new Response(JSON.stringify({ error: "نام، قیمت و آدرس تصویر محصول الزامی است" }), {
         status: 400,
         headers: { "Content-Type": "application/json" },

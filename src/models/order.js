@@ -21,6 +21,10 @@ const OrderSchema = new mongoose.Schema(
     items: { type: [OrderItemSchema], required: true },
     subtotal: { type: Number, required: true },
     discount: { type: Number, default: 0 },
+    // "pickup" = customer collects in person (no fee); "courier" = home
+    // delivery, carries a flat shippingCost added on top of the items total
+    deliveryMethod: { type: String, enum: ["pickup", "courier"], default: "courier" },
+    shippingCost: { type: Number, default: 0 },
     totalPrice: { type: Number, required: true },
     couponCode: { type: String, default: "" },
     // pending    -> waiting for the customer to complete payment at the gateway

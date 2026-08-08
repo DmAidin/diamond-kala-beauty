@@ -13,10 +13,13 @@ const ProductSchema = new mongoose.Schema(
       required: [true, "Product price is required"],
       min: [0, "Price can't be negative"],
     },
-    image: {
-      type: String,
-      required: [true, "Product image URL is required"],
-      trim: true,
+    images: {
+      type: [String],
+      required: [true, "At least one product image is required"],
+      validate: {
+        validator: (arr) => Array.isArray(arr) && arr.length > 0,
+        message: "At least one product image is required",
+      },
     },
     description: {
       type: String,

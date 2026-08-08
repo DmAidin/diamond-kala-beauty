@@ -13,11 +13,14 @@ const provinces = [
   "گلستان", "سمنان", "مرکزی", "ایلام", "کهگیلویه و بویراحمد", "خراسان شمالی", "خراسان جنوبی",
 ];
 
+const COURIER_FEE = 200000;
+
 export default function CheckoutPage() {
   const cart = useSelector((state) => state.cart);
   const { data: session, status } = useSession();
   const router = useRouter();
 
+  const [deliveryMethod, setDeliveryMethod] = useState("courier");
   const [form, setForm] = useState({
     fullName: "",
     phone: "",
@@ -35,7 +38,8 @@ export default function CheckoutPage() {
   const [error, setError] = useState(null);
 
   const discount = coupon?.discount || 0;
-  const finalTotal = Math.max(cart.totalPrice - discount, 0);
+  const shippingCost = deliveryMethod === "courier" ? COURIER_FEE : 0;
+  const finalTotal = Math.max(cart.totalPrice - discount, 0) + shippingCost;
 
   const applyCoupon = async () => {
     if (!couponInput.trim()) return;
@@ -72,7 +76,7 @@ export default function CheckoutPage() {
       const orderRes = await fetch("/api/orders", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ items: cart.items, receiver: form, couponCode: coupon?.code || "" }),
+        body: JSON.stringify({ items: cart.items, receiver: form, couponCode: coupon?.code || "", deliveryMethod }),
       });
       const order = await orderRes.json();
       if (!orderRes.ok) throw new Error(order.error || "ثبت سفارش ناموفق بود");
@@ -125,6 +129,32 @@ export default function CheckoutPage() {
 
       <div className="grid grid-cols-1 lg:grid-cols-5 gap-8">
         <form onSubmit={handleSubmit} className="lg:col-span-3 bg-base-panel border border-base-line rounded-sm p-6 space-y-5">
+          <h2 className="font-display text-lg text-ink mb-2">روش تحویل</h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
+            <button
+              type="button"
+              onClick={() => setDeliveryMethod("courier")}
+              disabled={submitting}
+              className={`text-right p-4 rounded-sm border transition-colors ${
+                deliveryMethod === "courier" ? "border-gold bg-gold/10" : "border-base-line hover:border-gold/50"
+              }`}
+            >
+              <p className="text-ink font-medium mb-1">ارسال با پیک</p>
+              <p className="text-ink-muted text-xs">تحویل درب منزل — {COURIER_FEE.toLocaleString()} تومان هزینه ارسال</p>
+            </button>
+            <button
+              type="button"
+              onClick={() => setDeliveryMethod("pickup")}
+              disabled={submitting}
+              className={`text-right p-4 rounded-sm border transition-colors ${
+                deliveryMethod === "pickup" ? "border-gold bg-gold/10" : "border-base-line hover:border-gold/50"
+              }`}
+            >
+              <p className="text-ink font-medium mb-1">تحویل حضوری</p>
+              <p className="text-ink-muted text-xs">دریافت از فروشگاه — بدون هزینه ارسال</p>
+            </button>
+          </div>
+
           <h2 className="font-display text-lg text-ink mb-2">اطلاعات گیرنده</h2>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
@@ -237,6 +267,12 @@ export default function CheckoutPage() {
                 <span className="text-signal-ok font-mono">−{discount.toLocaleString()}</span>
               </div>
             )}
+            <div className="spec-row text-sm">
+              <span className="text-ink-muted">هزینه ارسال</span>
+              <span className="text-ink font-mono">
+                {shippingCost > 0 ? shippingCost.toLocaleString() : "رایگان (تحویل حضوری)"}
+              </span>
+            </div>
             <div className="spec-row text-ink text-base font-semibold">
               <span>مبلغ قابل پرداخت (تومان)</span>
               <span className="text-gold">{finalTotal.toLocaleString()}</span>

@@ -49,7 +49,7 @@ export default function ProductCard({ product, wishlistIds }) {
 
         <div className="opal-shimmer h-40 flex items-center justify-center mb-4 bg-gradient-to-br from-gold-soft/20 via-base to-teal/10 rounded-sm">
           <img
-            src={product.image}
+            src={product.images?.[0] || product.image}
             alt={product.name}
             className="max-h-40 object-contain group-hover:scale-105 transition-transform duration-500"
           />

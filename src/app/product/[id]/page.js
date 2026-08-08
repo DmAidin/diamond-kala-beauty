@@ -16,6 +16,7 @@ export default function ProductDetailPage({ params }) {
   const [error, setError] = useState(null);
   const [added, setAdded] = useState(false);
   const [wished, setWished] = useState(false);
+  const [activeImage, setActiveImage] = useState(0);
   const [reviews, setReviews] = useState([]);
   const [average, setAverage] = useState(0);
   const [reviewCount, setReviewCount] = useState(0);
@@ -122,7 +123,7 @@ export default function ProductDetailPage({ params }) {
     "@type": "Product",
     name: product.name,
     description: product.description,
-    image: product.image,
+    image: product.images?.[0] || product.image,
     brand: product.brand || undefined,
     offers: {
       "@type": "Offer",
@@ -152,16 +153,38 @@ export default function ProductDetailPage({ params }) {
       </nav>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
-        <div className="pastel-card opal-shimmer bg-gradient-to-br from-gold-soft/15 via-base-panel to-teal/10 border border-base-line p-10 flex items-center justify-center relative">
-          <img src={product.image} alt={product.name} className="max-h-96 object-contain" />
-          {session && (
-            <button
-              onClick={toggleWishlist}
-              aria-label="افزودن به علاقه‌مندی‌ها"
-              className="absolute top-4 left-4 w-10 h-10 rounded-full bg-base border border-base-line flex items-center justify-center hover:border-gold transition-colors"
-            >
-              <HeartGlyph filled={wished} />
-            </button>
+        <div>
+          <div className="pastel-card opal-shimmer bg-gradient-to-br from-gold-soft/15 via-base-panel to-teal/10 border border-base-line p-10 flex items-center justify-center relative">
+            <img
+              src={(product.images && product.images[activeImage]) || product.image}
+              alt={product.name}
+              className="max-h-96 object-contain"
+            />
+            {session && (
+              <button
+                onClick={toggleWishlist}
+                aria-label="افزودن به علاقه‌مندی‌ها"
+                className="absolute top-4 left-4 w-10 h-10 rounded-full bg-base border border-base-line flex items-center justify-center hover:border-gold transition-colors"
+              >
+                <HeartGlyph filled={wished} />
+              </button>
+            )}
+          </div>
+
+          {product.images && product.images.length > 1 && (
+            <div className="flex gap-3 mt-4 overflow-x-auto pb-1">
+              {product.images.map((src, idx) => (
+                <button
+                  key={idx}
+                  onClick={() => setActiveImage(idx)}
+                  className={`shrink-0 w-16 h-16 rounded-sm border p-1 bg-base-panel transition-colors ${
+                    idx === activeImage ? "border-gold" : "border-base-line hover:border-gold/50"
+                  }`}
+                >
+                  <img src={src} alt={`${product.name} ${idx + 1}`} className="w-full h-full object-contain" />
+                </button>
+              ))}
+            </div>
           )}
         </div>
 

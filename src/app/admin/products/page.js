@@ -2,7 +2,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 
-const emptyForm = { name: "", price: "", image: "", category: "", brand: "", stock: "", description: "" };
+const emptyForm = { name: "", price: "", images: [], category: "", brand: "", stock: "", description: "" };
 
 export default function AdminProductsPage() {
   const [products, setProducts] = useState([]);
@@ -32,12 +32,21 @@ export default function AdminProductsPage() {
     }
   }
 
-  const handleImageChange = (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
-    const reader = new FileReader();
-    reader.onloadend = () => setForm((f) => ({ ...f, image: reader.result }));
-    reader.readAsDataURL(file);
+  // handles selecting any number of images at once — each file is read and
+  // appended to the gallery, existing images are kept
+  const handleImagesChange = (e) => {
+    const files = Array.from(e.target.files || []);
+    if (files.length === 0) return;
+    files.forEach((file) => {
+      const reader = new FileReader();
+      reader.onloadend = () => setForm((f) => ({ ...f, images: [...f.images, reader.result] }));
+      reader.readAsDataURL(file);
+    });
+    e.target.value = ""; // allow re-selecting the same file again later
+  };
+
+  const removeImage = (idx) => {
+    setForm((f) => ({ ...f, images: f.images.filter((_, i) => i !== idx) }));
   };
 
   const handleDelete = async (id) => {
@@ -57,8 +66,8 @@ export default function AdminProductsPage() {
     setSaving(true);
     setError(null);
 
-    if (!form.name.trim() || !form.price.toString().trim() || !form.image.trim()) {
-      setError("نام، قیمت و تصویر محصول را وارد کنید.");
+    if (!form.name.trim() || !form.price.toString().trim() || form.images.length === 0) {
+      setError("نام، قیمت و حداقل یک تصویر محصول را وارد کنید.");
       setSaving(false);
       return;
     }
@@ -66,7 +75,7 @@ export default function AdminProductsPage() {
     const payload = {
       name: form.name,
       price: Number(form.price),
-      image: form.image,
+      images: form.images,
       category: form.category.trim() || "متفرقه",
       brand: form.brand,
       stock: Number(form.stock) || 0,
@@ -107,7 +116,7 @@ export default function AdminProductsPage() {
     setForm({
       name: product.name,
       price: product.price,
-      image: product.image || "",
+      images: product.images && product.images.length > 0 ? product.images : (product.image ? [product.image] : []),
       category: product.category || "",
       brand: product.brand || "",
       stock: product.stock ?? "",
@@ -143,7 +152,7 @@ export default function AdminProductsPage() {
             list="category-options"
             value={form.category}
             onChange={(e) => setForm({ ...form, category: e.target.value })}
-            placeholder="مثلاً: پوشاک، لوازم خانگی، لوازم کامپیوتر..."
+            placeholder="مثلاً: مراقبت پوست، آرایش، عطر..."
             disabled={saving}
             className="w-full px-4 py-3 rounded-sm bg-base border border-base-line text-ink focus:outline-none focus:border-gold"
           />
@@ -155,11 +164,36 @@ export default function AdminProductsPage() {
           <p className="text-ink-faint text-xs mt-1">هر دسته‌ای که اینجا تایپ کنید، خودکار در فروشگاه به‌عنوان فیلتر ظاهر می‌شود.</p>
         </div>
 
-        <div>
-          <label className="block mb-2 text-sm text-ink-muted">تصویر محصول</label>
-          <input type="file" accept="image/*" onChange={handleImageChange} disabled={saving}
-            className="block w-full text-sm text-ink-muted file:ml-3 file:py-2 file:px-4 file:rounded-sm file:border-0 file:bg-gold/20 file:text-gold" />
-          {form.image && <img src={form.image} alt="preview" className="mt-3 w-24 h-24 object-cover rounded-sm border border-base-line" />}
+        <div className="sm:col-span-2">
+          <label className="block mb-2 text-sm text-ink-muted">تصاویر محصول (هر تعداد که بخواهید)</label>
+          <input
+            type="file"
+            accept="image/*"
+            multiple
+            onChange={handleImagesChange}
+            disabled={saving}
+            className="block w-full text-sm text-ink-muted file:ml-3 file:py-2 file:px-4 file:rounded-sm file:border-0 file:bg-gold/20 file:text-gold"
+          />
+          {form.images.length > 0 && (
+            <div className="flex flex-wrap gap-3 mt-3">
+              {form.images.map((src, idx) => (
+                <div key={idx} className="relative">
+                  <img src={src} alt={`تصویر ${idx + 1}`} className="w-20 h-20 object-cover rounded-sm border border-base-line" />
+                  <button
+                    type="button"
+                    onClick={() => removeImage(idx)}
+                    className="absolute -top-2 -right-2 w-6 h-6 rounded-full bg-signal-bad text-white text-xs flex items-center justify-center"
+                    aria-label="حذف این تصویر"
+                  >
+                    ✕
+                  </button>
+                  {idx === 0 && (
+                    <span className="absolute bottom-0 inset-x-0 text-[10px] text-center bg-gold text-base rounded-b-sm">اصلی</span>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
         </div>
 
         <div className="sm:col-span-2">
