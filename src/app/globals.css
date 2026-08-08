@@ -1,0 +1,157 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Light theme — "Opal Seashell Cascade": warm cream base, dusty rose +
+   soft peach + opal teal, on light neutral gray lines */
+:root,
+.light {
+  --color-base: 251 247 245;
+  --color-base-panel: 255 255 255;
+  --color-base-raised: 247 237 231;
+  --color-base-line: 219 219 219;
+
+  --color-gold: 197 146 168;      /* dusty rose #C592A8 — primary accent */
+  --color-gold-soft: 244 204 156; /* soft peach #F4CC9C — secondary/highlight */
+  --color-gold-dim: 158 100 128;  /* deeper rose — dim/muted state */
+
+  --color-teal: 62 188 179;       /* opal teal #3EBCB3 — tertiary accent */
+
+  --color-ink: 58 46 50;
+  --color-ink-muted: 124 106 112;
+  --color-ink-faint: 176 163 168;
+
+  --color-signal-ok: 62 188 179;
+  --color-signal-warn: 196 140 60;
+  --color-signal-bad: 196 92 92;
+}
+
+/* Dark theme — deep plum instead of flat black, keeps the pastel palette
+   legible rather than switching to a generic dark-tech look */
+.dark {
+  --color-base: 36 27 32;
+  --color-base-panel: 46 34 40;
+  --color-base-raised: 56 42 49;
+  --color-base-line: 74 58 66;
+
+  --color-gold: 224 178 199;
+  --color-gold-soft: 247 214 168;
+  --color-gold-dim: 197 146 168;
+
+  --color-teal: 94 205 197;
+
+  --color-ink: 240 232 235;
+  --color-ink-muted: 191 170 178;
+  --color-ink-faint: 138 116 125;
+
+  --color-signal-ok: 94 205 197;
+  --color-signal-warn: 224 178 110;
+  --color-signal-bad: 224 140 130;
+}
+
+html { scroll-behavior: smooth; }
+
+body {
+  background-color: rgb(var(--color-base));
+  color: rgb(var(--color-ink));
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+::selection {
+  background-color: rgb(var(--color-gold));
+  color: rgb(var(--color-base));
+}
+
+:focus-visible {
+  outline: 2px solid rgb(var(--color-gold));
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+}
+
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-track { background: rgb(var(--color-base)); }
+::-webkit-scrollbar-thumb { background: rgb(var(--color-base-line)); border-radius: 8px; }
+::-webkit-scrollbar-thumb:hover { background: rgb(var(--color-gold-dim)); }
+
+/* signature: a soft rose → peach → teal sweep, standing in for the amber
+   "trace-line" of the tech theme — this is the opal cascade in miniature */
+@keyframes cascade-pulse {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+.cascade-line {
+  height: 3px;
+  border-radius: 999px;
+  background: linear-gradient(90deg,
+    transparent, rgb(var(--color-gold)) 25%, rgb(var(--color-gold-soft)) 50%, rgb(var(--color-teal)) 75%, transparent);
+  background-size: 200% 100%;
+  animation: cascade-pulse 5s ease-in-out infinite;
+}
+
+@keyframes fade-up {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.fade-up { animation: fade-up 0.5s ease-out both; }
+
+/* signature: soft scalloped card — generous radius + gentle shadow,
+   replacing the tech theme's cut-diamond corners with a rounded,
+   seashell-like silhouette suited to a beauty storefront */
+.pastel-card {
+  border-radius: 1.5rem;
+  transition: transform 0.35s ease, box-shadow 0.35s ease;
+}
+.pastel-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 18px 34px -18px rgb(var(--color-gold) / 0.45);
+}
+
+/* signature: opal shimmer — a slow-moving pastel gradient sheen that
+   crosses product art on hover, evoking color-shifting nacre/opal */
+.opal-shimmer { position: relative; overflow: hidden; }
+.opal-shimmer::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(115deg,
+    transparent 35%,
+    rgb(var(--color-gold-soft) / 0.55) 48%,
+    rgb(var(--color-teal) / 0.45) 55%,
+    transparent 68%
+  );
+  transform: translateX(-130%);
+  transition: transform 0.8s ease;
+  pointer-events: none;
+}
+.opal-shimmer:hover::after { transform: translateX(130%); }
+
+/* gentle continuous float, used sparingly on a couple of decorative
+   accents — never on content the eye needs to read */
+@keyframes float-soft {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+.float { animation: float-soft 6s ease-in-out infinite; }
+.float-delay { animation: float-soft 6s ease-in-out infinite; animation-delay: 1.5s; }
+
+.spec-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.6rem 0;
+  border-bottom: 1px solid rgb(var(--color-base-line));
+  font-family: var(--font-mono), monospace;
+  font-size: 0.85rem;
+}
+.spec-row:last-child { border-bottom: none; }
+
+/* Soften the whole app's corner language for the pastel theme — the tech
+   variant used sharp rounded-sm everywhere; this store reads gentler with
+   one global override instead of touching every component. */
+.rounded-sm { border-radius: 0.85rem; }
