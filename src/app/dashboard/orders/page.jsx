@@ -49,7 +49,7 @@ export default function OrdersPage() {
               >
                 <div className="flex items-center justify-between mb-3">
                   <span className="font-mono text-ink-faint text-sm">
-                    سفارش #{order._id.slice(-6)}
+                    {order.orderNumber || `سفارش #${order._id.slice(-6)}`}
                   </span>
                   <span className={`text-xs px-2 py-1 rounded-sm border ${s.cls}`}>{s.label}</span>
                 </div>

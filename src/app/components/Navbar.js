@@ -34,9 +34,7 @@ export default function Navbar() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
         <div className="flex items-center gap-4 h-16">
           <Link href="/" className="flex items-center gap-2 shrink-0">
-            <span className="w-8 h-8 rounded-full border border-gold/60 flex items-center justify-center text-gold font-mono text-sm">
-              DK
-            </span>
+            <img src="/logo.png" alt="دایموند کالا" className="w-9 h-9 object-contain" />
             <span className="font-display text-lg tracking-wide text-ink hidden sm:inline">
               دایموند کالا
             </span>

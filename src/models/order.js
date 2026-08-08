@@ -13,6 +13,11 @@ const OrderItemSchema = new mongoose.Schema(
 const OrderSchema = new mongoose.Schema(
   {
     userId: { type: String, required: true, index: true },
+    // human-readable, sequential order reference — e.g. DK-260808-0007.
+    // Distinct from ZarinPal's payment refId and from the courier's
+    // trackingCode; this is the number customers and admins use to talk
+    // about the order itself.
+    orderNumber: { type: String, unique: true, sparse: true },
     items: { type: [OrderItemSchema], required: true },
     subtotal: { type: Number, required: true },
     discount: { type: Number, default: 0 },

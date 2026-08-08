@@ -6,9 +6,7 @@ export default function Footer() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 py-10 grid grid-cols-1 sm:grid-cols-4 gap-8 text-sm">
         <div>
           <div className="flex items-center gap-2 mb-3">
-            <span className="w-7 h-7 rounded-full border border-gold/60 flex items-center justify-center text-gold font-mono text-xs">
-              DK
-            </span>
+            <img src="/logo.png" alt="دایموند کالا" className="w-8 h-8 object-contain" />
             <span className="font-display text-ink">دایموند کالا</span>
           </div>
           <p className="text-ink-muted leading-6">

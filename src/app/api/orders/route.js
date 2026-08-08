@@ -3,6 +3,8 @@ import { authOptions } from "../auth/[...nextauth]/route";
 import { connectToDB } from "../../../utils/database";
 import Order from "../../../models/order";
 import Coupon from "../../../models/coupon";
+import Product from "../../../models/product";
+import Counter from "../../../models/counter";
 
 // GET: list the current user's own orders
 export async function GET() {
@@ -24,8 +26,26 @@ export async function GET() {
   }
 }
 
+// Atomically claims the next order number for today, e.g. DK-260808-0007.
+async function nextOrderNumber() {
+  const now = new Date();
+  const y = String(now.getFullYear()).slice(-2);
+  const m = String(now.getMonth() + 1).padStart(2, "0");
+  const d = String(now.getDate()).padStart(2, "0");
+  const dayKey = `order-${y}${m}${d}`;
+
+  const counter = await Counter.findOneAndUpdate(
+    { _id: dayKey },
+    { $inc: { seq: 1 } },
+    { upsert: true, new: true }
+  );
+
+  return `DK-${y}${m}${d}-${String(counter.seq).padStart(4, "0")}`;
+}
+
 // POST: create a new pending order from the client-side cart.
 // Coupon is re-validated here server-side so a tampered client can't grant itself a discount.
+// Stock is checked (not yet deducted — that happens once payment is verified).
 export async function POST(request) {
   const session = await getServerSession(authOptions);
   if (!session) {
@@ -43,11 +63,23 @@ export async function POST(request) {
       return new Response(JSON.stringify({ error: "اطلاعات گیرنده کامل نیست" }), { status: 400 });
     }
 
+    await connectToDB();
+
+    // confirm every item is still in stock before creating the order
+    const products = await Product.find({ _id: { $in: items.map((i) => i.id) } });
+    for (const item of items) {
+      const product = products.find((p) => String(p._id) === item.id);
+      if (!product || product.stock < item.quantity) {
+        return new Response(
+          JSON.stringify({ error: `موجودی «${item.title}» کافی نیست` }),
+          { status: 400 }
+        );
+      }
+    }
+
     const subtotal = items.reduce((sum, i) => sum + i.price * i.quantity, 0);
     let discount = 0;
     let appliedCode = "";
-
-    await connectToDB();
 
     if (couponCode?.trim()) {
       const coupon = await Coupon.findOne({ code: couponCode.trim().toUpperCase() });
@@ -63,9 +95,11 @@ export async function POST(request) {
     }
 
     const totalPrice = Math.max(subtotal - discount, 0);
+    const orderNumber = await nextOrderNumber();
 
     const order = await Order.create({
       userId: session.user.id,
+      orderNumber,
       items: items.map((i) => ({
         productId: i.id,
         title: i.title,

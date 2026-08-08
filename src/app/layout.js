@@ -32,6 +32,10 @@ export const metadata = {
     type: "website",
     locale: "fa_IR",
   },
+  icons: {
+    icon: "/logo.png",
+    apple: "/logo.png",
+  },
 };
 
 export default function RootLayout({ children }) {

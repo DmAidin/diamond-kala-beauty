@@ -65,12 +65,23 @@ export default function AdminOrdersPage() {
           {orders.map((o) => (
             <div key={o._id} className="bg-base-panel border border-base-line rounded-sm p-5">
               <div className="flex flex-wrap items-center justify-between gap-3 mb-3">
-                <span className="font-mono text-ink-faint text-sm">#{o._id.slice(-6)}</span>
+                <span className="font-mono text-ink-faint text-sm">
+                  {o.orderNumber || `#${o._id.slice(-6)}`}
+                </span>
                 <span className="text-ink text-sm">{o.receiver?.fullName}</span>
                 <span className="font-mono text-gold">{o.totalPrice.toLocaleString()} تومان</span>
                 <span className={`text-xs px-2 py-1 rounded-sm border ${statusCls[o.status]}`}>
                   {statusOptions.find((s) => s.value === o.status)?.label}
                 </span>
+              </div>
+
+              <div className="bg-base border border-base-line rounded-sm px-4 mb-4">
+                {o.items?.map((item, idx) => (
+                  <div key={idx} className="spec-row">
+                    <span className="text-ink-muted">{item.title} × {item.quantity}</span>
+                    <span className="text-ink">{(item.price * item.quantity).toLocaleString()} تومان</span>
+                  </div>
+                ))}
               </div>
 
               <div className="bg-base border border-base-line rounded-sm px-4 mb-4">

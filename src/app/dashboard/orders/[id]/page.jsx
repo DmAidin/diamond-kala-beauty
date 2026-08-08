@@ -32,7 +32,7 @@ export default function OrderDetailPage({ params }) {
   return (
     <main className="max-w-3xl mx-auto px-4 sm:px-6 py-12">
       <div className="flex items-center justify-between mb-8">
-        <h1 className="font-display text-2xl text-ink">سفارش #{order._id.slice(-6)}</h1>
+        <h1 className="font-display text-2xl text-ink">{order.orderNumber || `سفارش #${order._id.slice(-6)}`}</h1>
         <Link href="/dashboard/orders" className="text-sm text-ink-muted hover:text-gold">بازگشت به سفارش‌ها</Link>
       </div>
 

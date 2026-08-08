@@ -10,6 +10,7 @@ function ResultBody() {
   const params = useSearchParams();
   const status = params.get("status");
   const refId = params.get("refId");
+  const orderNumber = params.get("orderNumber");
   const dispatch = useDispatch();
   const paid = status === "paid";
 
@@ -34,8 +35,11 @@ function ResultBody() {
           ? "سفارش شما ثبت شد و به‌زودی برای ارسال آماده می‌شود."
           : "پرداخت شما تکمیل نشد یا لغو شد. می‌توانید دوباره تلاش کنید."}
       </p>
+      {paid && orderNumber && (
+        <p className="font-mono text-lg text-ink mb-2">شماره سفارش: {orderNumber}</p>
+      )}
       {paid && refId && (
-        <p className="font-mono text-sm text-gold mb-8">کد پیگیری: {refId}</p>
+        <p className="font-mono text-xs text-ink-faint mb-8">کد پیگیری پرداخت: {refId}</p>
       )}
       <div className="flex gap-3 justify-center">
         <Link href="/dashboard/orders" className="px-6 py-3 rounded-sm bg-gold text-base font-semibold">
