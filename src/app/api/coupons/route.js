@@ -2,12 +2,21 @@ import { getServerSession } from "next-auth/next";
 import { authOptions } from "../auth/[...nextauth]/route";
 import { connectToDB } from "../../../utils/database";
 import Coupon from "../../../models/coupon";
+import { rateLimit } from "../../../utils/rateLimit";
 
 // POST { code, subtotal }: validates a coupon and returns the discount it grants
 export async function POST(request) {
   const session = await getServerSession(authOptions);
   if (!session) {
     return new Response(JSON.stringify({ error: "لطفاً ابتدا وارد شوید" }), { status: 401 });
+  }
+
+  const limited = await rateLimit(`coupon:${session.user.id}`, { limit: 15, windowSeconds: 600 });
+  if (!limited.ok) {
+    return new Response(JSON.stringify({ error: "تعداد تلاش‌ها زیاد بوده، کمی بعد دوباره امتحان کنید" }), {
+      status: 429,
+      headers: { "Retry-After": String(limited.retryAfter) },
+    });
   }
 
   try {

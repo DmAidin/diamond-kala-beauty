@@ -5,6 +5,7 @@ import Order from "../../../models/order";
 import Coupon from "../../../models/coupon";
 import Product from "../../../models/product";
 import Counter from "../../../models/counter";
+import { rateLimit } from "../../../utils/rateLimit";
 
 // GET: list the current user's own orders
 export async function GET() {
@@ -54,6 +55,14 @@ export async function POST(request) {
   const session = await getServerSession(authOptions);
   if (!session) {
     return new Response(JSON.stringify({ error: "لطفاً ابتدا وارد شوید" }), { status: 401 });
+  }
+
+  const limited = await rateLimit(`create-order:${session.user.id}`, { limit: 10, windowSeconds: 600 });
+  if (!limited.ok) {
+    return new Response(JSON.stringify({ error: "تعداد سفارش‌های ثبت‌شده زیاد بوده، کمی صبر کنید" }), {
+      status: 429,
+      headers: { "Retry-After": String(limited.retryAfter) },
+    });
   }
 
   try {

@@ -11,12 +11,11 @@ export default function Register() {
   const [error, setError] = useState(null);
 
   const formik = useFormik({
-    initialValues: { name: "", email: "", password: "", adminKey: "" },
+    initialValues: { name: "", email: "", password: "" },
     validationSchema: Yup.object({
       name: Yup.string().required("نام الزامی است"),
       email: Yup.string().email("ایمیل نامعتبر").required("ایمیل الزامی است"),
       password: Yup.string().min(6, "رمز عبور باید حداقل ۶ کاراکتر باشد").required("رمز عبور الزامی است"),
-      adminKey: Yup.string(),
     }),
     onSubmit: async (values) => {
       try {
@@ -75,7 +74,6 @@ export default function Register() {
           {field("name", "نام")}
           {field("email", "ایمیل", "email")}
           {field("password", "رمز عبور", "password")}
-          {field("adminKey", "کلید ادمین (اختیاری)")}
 
           <button
             type="submit"

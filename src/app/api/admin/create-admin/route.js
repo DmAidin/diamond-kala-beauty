@@ -1,8 +1,18 @@
 import { hash } from "bcryptjs";
 import prisma from "../../../lib/prisma";
+import { rateLimit, getClientIp } from "../../../../utils/rateLimit";
 
 export async function POST(req) {
   try {
+    const ip = getClientIp(req);
+    const limited = await rateLimit(`create-admin:${ip}`, { limit: 3, windowSeconds: 3600 });
+    if (!limited.ok) {
+      return new Response(JSON.stringify({ message: "تعداد تلاش‌های شما زیاد بوده، بعداً دوباره امتحان کنید" }), {
+        status: 429,
+        headers: { "Retry-After": String(limited.retryAfter) },
+      });
+    }
+
     const body = await req.json();
     const { name, email, password, secret } = body;
 

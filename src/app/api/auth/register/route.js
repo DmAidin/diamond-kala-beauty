@@ -1,10 +1,20 @@
 import { hash } from "bcryptjs";
 import prisma from "../../../lib/prisma";
+import { rateLimit, getClientIp } from "../../../../utils/rateLimit";
 
 export async function POST(req) {
   try {
+    const ip = getClientIp(req);
+    const limited = await rateLimit(`register:${ip}`, { limit: 5, windowSeconds: 600 });
+    if (!limited.ok) {
+      return new Response(
+        JSON.stringify({ message: "تعداد تلاش‌های شما زیاد بوده، کمی بعد دوباره امتحان کنید" }),
+        { status: 429, headers: { "Retry-After": String(limited.retryAfter) } }
+      );
+    }
+
     const body = await req.json();
-    const { name, email, password, adminKey } = body;
+    const { name, email, password } = body;
 
     if (!name || !email || !password) {
       return new Response(
@@ -23,25 +33,20 @@ export async function POST(req) {
 
     const hashedPassword = await hash(password, 10);
 
-    // بررسی کلید ادمین از env
-    const isAdmin =
-      adminKey && adminKey === process.env.ADMIN_SECRET ? true : false;
-
+    // every public sign-up is a plain customer account now — admin
+    // accounts are only created through the separate, secret-protected
+    // /api/admin/create-admin endpoint, never via this public form
     await prisma.user.create({
       data: {
         name,
         email,
         password: hashedPassword,
-        role: isAdmin ? "admin" : "user",
+        role: "user",
       },
     });
 
     return new Response(
-      JSON.stringify({
-        message: isAdmin
-          ? "ثبت‌نام ادمین با موفقیت انجام شد"
-          : "ثبت‌نام با موفقیت انجام شد",
-      }),
+      JSON.stringify({ message: "ثبت‌نام با موفقیت انجام شد" }),
       { status: 201 }
     );
   } catch (error) {

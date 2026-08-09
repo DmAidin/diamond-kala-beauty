@@ -2,10 +2,20 @@ import { getServerSession } from "next-auth/next";
 import { authOptions } from "../auth/[...nextauth]/route";
 import { connectToDB } from "../../../utils/database";
 import Message from "../../../models/message";
+import { rateLimit, getClientIp } from "../../../utils/rateLimit";
 
 // POST: anyone can send a contact message
 export async function POST(request) {
   try {
+    const ip = getClientIp(request);
+    const limited = await rateLimit(`contact:${ip}`, { limit: 5, windowSeconds: 3600 });
+    if (!limited.ok) {
+      return new Response(JSON.stringify({ error: "تعداد پیام‌های ارسالی زیاد بوده، بعداً دوباره امتحان کنید" }), {
+        status: 429,
+        headers: { "Retry-After": String(limited.retryAfter) },
+      });
+    }
+
     const body = await request.json();
     const { name, email, phone, text } = body;
 
