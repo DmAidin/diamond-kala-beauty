@@ -5,6 +5,8 @@ import { ThemeProvider } from "./theme-provider";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 import ChatWidget from "./components/ChatWidget";
+import VisitTracker from "./components/VisitTracker";
+import MobileTabBar from "./components/MobileTabBar";
 
 const display = Playfair_Display({
   subsets: ["latin"],
@@ -56,9 +58,11 @@ export default function RootLayout({ children }) {
         <ThemeProvider>
           <Providers>
             <Navbar />
-            <div className="flex-1">{children}</div>
+            <div className="flex-1 pb-20 lg:pb-0">{children}</div>
             <Footer />
             <ChatWidget />
+            <VisitTracker />
+            <MobileTabBar />
           </Providers>
         </ThemeProvider>
       </body>

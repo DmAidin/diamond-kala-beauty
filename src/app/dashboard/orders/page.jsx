@@ -53,6 +53,9 @@ export default function OrdersPage() {
                   </span>
                   <span className={`text-xs px-2 py-1 rounded-sm border ${s.cls}`}>{s.label}</span>
                 </div>
+                <p className="text-ink-faint text-xs font-mono mb-3">
+                  {new Date(order.createdAt).toLocaleString("fa-IR", { dateStyle: "long", timeStyle: "short" })}
+                </p>
                 <div className="text-sm text-ink-muted space-y-1 mb-3">
                   {order.items.map((item, idx) => (
                     <div key={idx} className="flex justify-between">

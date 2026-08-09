@@ -36,12 +36,15 @@ export default function OrderDetailPage({ params }) {
         <Link href="/dashboard/orders" className="text-sm text-ink-muted hover:text-gold">بازگشت به سفارش‌ها</Link>
       </div>
 
-      <div className="flex items-center gap-3 mb-8">
+      <div className="flex items-center gap-3 mb-2">
         <span className={`text-xs px-3 py-1 rounded-sm border ${s.cls}`}>{s.label}</span>
         {order.trackingCode && (
           <span className="text-xs font-mono text-ink-muted">کد رهگیری پستی: {order.trackingCode}</span>
         )}
       </div>
+      <p className="text-ink-faint text-xs font-mono mb-8">
+        تاریخ ثبت سفارش: {new Date(order.createdAt).toLocaleString("fa-IR", { dateStyle: "long", timeStyle: "short" })}
+      </p>
 
       <div className="bg-base-panel border border-base-line rounded-sm p-5 mb-6">
         <h2 className="font-display text-sm text-ink mb-3">اقلام سفارش</h2>

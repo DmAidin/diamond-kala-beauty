@@ -75,7 +75,7 @@ export default function ChatWidget() {
   if (status === "loading") return null;
 
   return (
-    <div className="fixed bottom-5 left-5 z-50">
+    <div className="fixed bottom-24 lg:bottom-5 left-5 z-40">
       {open && (
         <div className="mb-3 w-80 max-w-[calc(100vw-2.5rem)] bg-base-panel border border-base-line rounded-sm shadow-xl flex flex-col overflow-hidden">
           <div className="flex items-center justify-between px-4 py-3 border-b border-base-line">

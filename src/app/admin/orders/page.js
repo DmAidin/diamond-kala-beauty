@@ -69,6 +69,9 @@ export default function AdminOrdersPage() {
                   {o.orderNumber || `#${o._id.slice(-6)}`}
                 </span>
                 <span className="text-ink text-sm">{o.receiver?.fullName}</span>
+                <span className="text-ink-faint text-xs font-mono">
+                  {new Date(o.createdAt).toLocaleString("fa-IR", { dateStyle: "short", timeStyle: "short" })}
+                </span>
                 <span className="font-mono text-gold">{o.totalPrice.toLocaleString()} تومان</span>
                 <span className={`text-xs px-2 py-1 rounded-sm border ${statusCls[o.status]}`}>
                   {statusOptions.find((s) => s.value === o.status)?.label}
