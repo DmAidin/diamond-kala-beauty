@@ -1,4 +1,4 @@
-export const metadata = { title: "حریم خصوصی | دایموند کالا" };
+export const metadata = { title: "حریم خصوصی | دایمند کالا" };
 
 export default function PrivacyPage() {
   return (

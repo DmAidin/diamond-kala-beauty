@@ -58,16 +58,16 @@ export default function Navbar() {
   };
 
   return (
-    <header className="sticky top-0 z-40 bg-base/95 backdrop-blur border-b border-base-line">
+    <header className="relative md:sticky md:top-0 z-40 bg-base/95 backdrop-blur border-b border-base-line">
       <div className="trace-line" />
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
         <div className="flex items-center gap-6 lg:gap-10 h-28 lg:h-36">
           <Link href="/" className="flex items-center gap-2 shrink-0">
             <div className="relative w-24 h-24 lg:w-32 lg:h-32">
-              <Image src="/logo.png" alt="دایموند کالا" fill sizes="128px" className="object-contain" priority />
+              <Image src="/logo.png" alt="دایمند کالا" fill sizes="128px" className="object-contain" priority />
             </div>
             <span className="font-display text-lg tracking-wide text-ink hidden sm:inline">
-              دایموند کالا
+              دایمند کالا
             </span>
           </Link>
 
@@ -168,6 +168,65 @@ export default function Navbar() {
               <div className="hidden lg:block w-24 h-8 rounded-sm bg-base-raised animate-pulse" />
             )}
           </div>
+        </div>
+
+        {/* Mobile-only sub-header: the top row above is compact (logo +
+            theme toggle) so this fills the rest with search, auth state,
+            and a horizontal category strip — nothing here duplicates the
+            bottom tab bar's job. */}
+        <div className="md:hidden pb-3 space-y-3">
+          <form onSubmit={handleSearch}>
+            <input
+              type="text"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              placeholder="جستجو در میان محصولات فروشگاه..."
+              className="w-full bg-base-panel border border-base-line rounded-sm px-4 py-2.5 text-sm text-ink focus:outline-none focus:border-gold"
+            />
+          </form>
+
+          {status === "authenticated" ? (
+            <Link href="/dashboard" className="flex items-center gap-2 text-sm text-ink">
+              <span className="w-8 h-8 rounded-full bg-gold-soft/30 border border-gold/40 text-gold flex items-center justify-center font-display text-sm shrink-0">
+                {(session.user.name || session.user.email || "؟").charAt(0)}
+              </span>
+              سلام، {session.user.name || session.user.email}
+            </Link>
+          ) : status === "unauthenticated" ? (
+            <div className="flex gap-2">
+              <Link
+                href="/auth/login"
+                className="flex-1 text-center text-sm px-4 py-2 rounded-sm border border-gold/60 text-gold"
+              >
+                ورود
+              </Link>
+              <Link
+                href="/auth/register"
+                className="flex-1 text-center text-sm px-4 py-2 rounded-sm bg-gold text-base font-semibold"
+              >
+                ثبت‌نام
+              </Link>
+            </div>
+          ) : (
+            <div className="h-9 rounded-sm bg-base-raised animate-pulse" />
+          )}
+
+          {categories.length > 0 && (
+            <div className="flex gap-2 overflow-x-auto pb-1 -mx-4 px-4">
+              {categories.map((c) => (
+                <Link
+                  key={c}
+                  href={`/?category=${encodeURIComponent(c)}`}
+                  className="shrink-0 flex flex-col items-center gap-1.5 w-16"
+                >
+                  <span className="w-12 h-12 rounded-full bg-gradient-to-br from-gold-soft/30 to-teal/20 border border-base-line flex items-center justify-center text-gold font-display text-sm">
+                    {c.charAt(0)}
+                  </span>
+                  <span className="text-[10px] text-ink-muted text-center leading-tight line-clamp-2">{c}</span>
+                </Link>
+              ))}
+            </div>
+          )}
         </div>
       </div>
     </header>

@@ -8,9 +8,9 @@ export default function Footer() {
         <div>
           <div className="flex items-center gap-2 mb-3">
             <div className="relative w-28 h-28">
-              <Image src="/logo.png" alt="دایموند کالا" fill sizes="112px" className="object-contain" />
+              <Image src="/logo.png" alt="دایمند کالا" fill sizes="112px" className="object-contain" />
             </div>
-            <span className="font-display text-ink">دایموند کالا</span>
+            <span className="font-display text-ink">دایمند کالا</span>
           </div>
           <p className="text-ink-muted leading-6">
             فروشگاه اینترنتی لوازم آرایشی و بهداشتی اورجینال، با بسته‌بندی ویژه، ارسال سریع و ضمانت اصالت کالا.

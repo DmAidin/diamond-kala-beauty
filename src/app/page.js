@@ -9,6 +9,7 @@ import Reveal from "./components/Reveal";
 import RecentlyViewed from "./components/RecentlyViewed";
 import EmptyState from "./components/EmptyState";
 import { ProductGridSkeleton } from "./components/Skeleton";
+import ProductCarousel from "./components/ProductCarousel";
 
 const faqs = [
   { q: "چگونه سفارش خود را ثبت کنم؟", a: "کالای مورد نظر را به سبد خرید اضافه کرده و در مرحله‌ی تسویه حساب، اطلاعات گیرنده را وارد و پرداخت را از طریق درگاه بانکی تکمیل کنید." },
@@ -36,6 +37,9 @@ function StoreBody() {
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState(queryParam);
   const [sort, setSort] = useState("newest");
+  const [bestsellers, setBestsellers] = useState([]);
+  const [bestsellersLoading, setBestsellersLoading] = useState(true);
+  const [newest, setNewest] = useState([]);
   const [priceMin, setPriceMin] = useState("");
   const [priceMax, setPriceMax] = useState("");
   const [brandFilter, setBrandFilter] = useState("");
@@ -54,6 +58,18 @@ function StoreBody() {
       })
       .catch(() => setLoading(false));
   }, [activeCategory]);
+
+  useEffect(() => {
+    fetch("/api/products/bestsellers")
+      .then((res) => res.json())
+      .then((data) => setBestsellers(Array.isArray(data) ? data : []))
+      .finally(() => setBestsellersLoading(false));
+
+    fetch("/api/products")
+      .then((res) => res.json())
+      .then((data) => setNewest(Array.isArray(data) ? data.slice(0, 10) : []))
+      .catch(() => {});
+  }, []);
 
   useEffect(() => {
     fetch("/api/categories")
@@ -108,10 +124,10 @@ function StoreBody() {
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 py-20 sm:py-28">
           <p className="font-mono text-gold text-xs tracking-[0.3em] mb-4">DIAMOND KALA / BEAUTY &amp; CARE</p>
           <h1 className="font-display text-4xl sm:text-5xl text-ink max-w-2xl leading-tight mb-6">
-            دایموند کالا؛ زیبایی و مراقبت، با اطمینان خرید کنید
+            دایمند کالا؛ زیبایی و مراقبت، با اطمینان خرید کنید
           </h1>
           <p className="text-ink-muted max-w-xl leading-7 mb-8">
-            دایموند کالا مرجع خرید آنلاین لوازم آرایشی و بهداشتی اورجینال است؛ از مراقبت پوست و مو تا عطر و آرایش، با مشخصات شفاف، بسته‌بندی ویژه و ارسال سریع.
+            دایمند کالا مرجع خرید آنلاین لوازم آرایشی و بهداشتی اورجینال است؛ از مراقبت پوست و مو تا عطر و آرایش، با مشخصات شفاف، بسته‌بندی ویژه و ارسال سریع.
           </p>
           <div className="cascade-line max-w-xs mb-8" />
           <a
@@ -153,6 +169,9 @@ function StoreBody() {
           </div>
         </Reveal>
       )}
+
+      <ProductCarousel title="پرفروش‌ترین‌ها" products={bestsellers} loading={bestsellersLoading} wishlistIds={wishlistIds} />
+      <ProductCarousel title="تازه‌ترین محصولات" products={newest} loading={false} seeAllHref="/#catalog" wishlistIds={wishlistIds} />
 
       {/* Catalog + filters */}
       <section id="catalog" className="max-w-7xl mx-auto px-4 sm:px-6 py-10">
@@ -264,7 +283,7 @@ function StoreBody() {
 
       {/* Testimonials */}
       <Reveal className="max-w-7xl mx-auto px-4 sm:px-6 py-20">
-        <h2 className="font-display text-2xl text-ink mb-8 text-center">نظر مشتریان دایموند کالا</h2>
+        <h2 className="font-display text-2xl text-ink mb-8 text-center">نظر مشتریان دایمند کالا</h2>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
           {testimonials.map((t, i) => (
             <div key={i} className="pastel-card bg-base-panel border border-base-line p-6">

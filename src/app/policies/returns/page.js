@@ -1,4 +1,4 @@
-export const metadata = { title: "شرایط مرجوعی کالا | دایموند کالا" };
+export const metadata = { title: "شرایط مرجوعی کالا | دایمند کالا" };
 
 export default function ReturnsPage() {
   return (

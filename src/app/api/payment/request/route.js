@@ -28,7 +28,7 @@ export async function POST(request) {
 
     const result = await requestPayment({
       amountToman: order.totalPrice,
-      description: `پرداخت سفارش دایموند کالا #${order._id}`,
+      description: `پرداخت سفارش دایمند کالا #${order._id}`,
       callbackUrl,
       email: session.user.email,
     });

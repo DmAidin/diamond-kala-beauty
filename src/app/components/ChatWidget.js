@@ -81,7 +81,7 @@ export default function ChatWidget() {
           <div className="flex items-center justify-between px-4 py-3 border-b border-base-line">
             <div className="flex items-center gap-2">
               <span className={`w-2 h-2 rounded-full ${online ? "bg-signal-ok" : "bg-ink-faint"}`} />
-              <span className="text-sm text-ink font-medium">پشتیبانی دایموند کالا</span>
+              <span className="text-sm text-ink font-medium">پشتیبانی دایمند کالا</span>
             </div>
             <button onClick={() => setOpen(false)} className="text-ink-faint hover:text-gold">✕</button>
           </div>

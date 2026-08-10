@@ -17,15 +17,36 @@ export default async function AdminDashboardPage() {
   await connectToDB();
   const todayKey = tehranDateKey();
 
-  const [usersCount, productsCount, ordersCount, revenueAgg, lowStock, todayViews] = await Promise.all([
+  const [usersCount, productsCount, ordersCount, revenueAgg, lowStock, todayViews, statusBreakdown, topProducts, newUsersThisWeek] = await Promise.all([
     prisma.user.count(),
     Product.countDocuments(),
     Order.countDocuments({ status: "paid" }),
     Order.aggregate([{ $match: { status: "paid" } }, { $group: { _id: null, sum: { $sum: "$totalPrice" } } }]),
     Product.find({ stock: { $lte: 5 } }).sort({ stock: 1 }).limit(6),
     PageView.findOne({ date: todayKey }),
+    Order.aggregate([{ $group: { _id: "$status", count: { $sum: 1 } } }]),
+    Order.aggregate([
+      { $match: { status: { $in: ["paid", "processing", "shipped", "delivered"] } } },
+      { $unwind: "$items" },
+      { $group: { _id: "$items.title", qty: { $sum: "$items.quantity" } } },
+      { $sort: { qty: -1 } },
+      { $limit: 5 },
+    ]),
+    prisma.user.count({ where: { createdAt: { gte: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000) } } }),
   ]);
   const revenue = revenueAgg[0]?.sum || 0;
+  const avgOrderValue = ordersCount > 0 ? Math.round(revenue / ordersCount) : 0;
+
+  const statusLabels = {
+    pending: "در انتظار پرداخت",
+    paid: "پرداخت‌شده",
+    processing: "در حال آماده‌سازی",
+    shipped: "ارسال‌شده",
+    delivered: "تحویل داده‌شده",
+    failed: "ناموفق",
+    cancelled: "لغوشده",
+  };
+  const statusMap = Object.fromEntries(statusBreakdown.map((s) => [s._id, s.count]));
 
   const last7Days = [];
   for (let i = 6; i >= 0; i--) {
@@ -75,13 +96,47 @@ export default async function AdminDashboardPage() {
             <p className="text-ink-muted text-sm mt-2">خوش آمدی، {session.user.name}</p>
           </header>
 
-          <section className="grid grid-cols-2 lg:grid-cols-5 gap-5 mb-10">
+          <section className="grid grid-cols-2 lg:grid-cols-4 gap-5 mb-6">
             <Stat label="بازدید امروز" value={todayViews?.count || 0} />
             <Stat label="کاربران" value={usersCount} />
             <Stat label="محصولات" value={productsCount} />
             <Stat label="سفارش‌های پرداخت‌شده" value={ordersCount} />
-            <Stat label="درآمد (تومان)" value={revenue.toLocaleString()} accent />
           </section>
+          <section className="grid grid-cols-2 lg:grid-cols-3 gap-5 mb-10">
+            <Stat label="درآمد (تومان)" value={revenue.toLocaleString()} accent />
+            <Stat label="میانگین ارزش سفارش (تومان)" value={avgOrderValue.toLocaleString()} />
+            <Stat label="مشتریان جدید (۷ روز اخیر)" value={newUsersThisWeek} />
+          </section>
+
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-10">
+            <section>
+              <h2 className="font-display text-lg text-ink mb-4">وضعیت سفارش‌ها</h2>
+              <div className="bg-base-panel border border-base-line rounded-sm divide-y divide-base-line">
+                {Object.entries(statusLabels).map(([key, label]) => (
+                  <div key={key} className="flex items-center justify-between px-5 py-3 text-sm">
+                    <span className="text-ink-muted">{label}</span>
+                    <span className="text-ink font-mono">{statusMap[key] || 0}</span>
+                  </div>
+                ))}
+              </div>
+            </section>
+
+            <section>
+              <h2 className="font-display text-lg text-ink mb-4">پرفروش‌ترین محصولات</h2>
+              {topProducts.length === 0 ? (
+                <p className="text-ink-faint text-sm">هنوز فروشی ثبت نشده است.</p>
+              ) : (
+                <div className="bg-base-panel border border-base-line rounded-sm divide-y divide-base-line">
+                  {topProducts.map((p, i) => (
+                    <div key={p._id} className="flex items-center justify-between px-5 py-3 text-sm">
+                      <span className="text-ink-muted">{i + 1}. {p._id}</span>
+                      <span className="text-gold font-mono">{p.qty} عدد</span>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </section>
+          </div>
 
           <section className="mb-10">
             <h2 className="font-display text-lg text-ink mb-4">بازدید ۷ روز اخیر</h2>
