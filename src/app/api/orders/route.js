@@ -6,6 +6,7 @@ import Coupon from "../../../models/coupon";
 import Product from "../../../models/product";
 import Counter from "../../../models/counter";
 import { rateLimit } from "../../../utils/rateLimit";
+import { tehranDateStamp } from "../../../utils/dateUtils";
 
 // GET: list the current user's own orders
 export async function GET() {
@@ -29,11 +30,8 @@ export async function GET() {
 
 // Atomically claims the next order number for today, e.g. DK-260808-0007.
 async function nextOrderNumber() {
-  const now = new Date();
-  const y = String(now.getFullYear()).slice(-2);
-  const m = String(now.getMonth() + 1).padStart(2, "0");
-  const d = String(now.getDate()).padStart(2, "0");
-  const dayKey = `order-${y}${m}${d}`;
+  const stamp = tehranDateStamp(); // "YYMMDD" in Tehran time, not server UTC
+  const dayKey = `order-${stamp}`;
 
   const counter = await Counter.findOneAndUpdate(
     { _id: dayKey },
@@ -41,7 +39,7 @@ async function nextOrderNumber() {
     { upsert: true, new: true }
   );
 
-  return `DK-${y}${m}${d}-${String(counter.seq).padStart(4, "0")}`;
+  return `DK-${stamp}-${String(counter.seq).padStart(4, "0")}`;
 }
 
 // courier delivery flat fee, in Toman — enforced server-side so a client

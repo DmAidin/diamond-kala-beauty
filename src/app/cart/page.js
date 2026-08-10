@@ -3,6 +3,8 @@
 import { useSelector, useDispatch } from "react-redux";
 import { removeFromCart, increaseQuantity, decreaseQuantity } from "@/redux/cartSlice";
 import Link from "next/link";
+import Image from "next/image";
+import EmptyState from "../components/EmptyState";
 
 export default function CartPage() {
   const cart = useSelector((state) => state.cart);
@@ -10,11 +12,14 @@ export default function CartPage() {
 
   if (cart.items.length === 0) {
     return (
-      <main className="max-w-xl mx-auto px-4 py-24 text-center">
-        <p className="text-ink-muted mb-6">سبد خرید شما خالی است.</p>
-        <Link href="/" className="px-6 py-3 rounded-sm bg-gold text-base font-semibold inline-block">
-          مشاهده محصولات
-        </Link>
+      <main className="max-w-xl mx-auto px-4">
+        <EmptyState
+          icon="cart"
+          title="سبد خرید شما خالی است"
+          text="هنوز محصولی به سبد خریدتان اضافه نکرده‌اید."
+          actionHref="/"
+          actionLabel="مشاهده محصولات"
+        />
       </main>
     );
   }
@@ -23,14 +28,14 @@ export default function CartPage() {
     <main className="max-w-4xl mx-auto px-4 sm:px-6 py-12">
       <h1 className="font-display text-3xl text-ink mb-8">سبد خرید</h1>
 
-      <div className="bg-base-panel border border-base-line rounded-sm divide-y divide-base-line">
+      <div className="pastel-card bg-base-panel border border-base-line divide-y divide-base-line overflow-hidden">
         {cart.items.map((item) => (
           <div key={item.id} className="flex items-center gap-5 p-5">
-            <img
-              src={item.image || "/no-image.png"}
-              alt={item.title}
-              className="w-20 h-20 object-contain bg-base rounded-sm border border-base-line"
-            />
+            <div className="relative w-20 h-20 shrink-0 bg-base rounded-sm border border-base-line overflow-hidden">
+              {item.image && (
+                <Image src={item.image} alt={item.title} fill sizes="80px" className="object-contain p-1" />
+              )}
+            </div>
             <div className="flex-1 min-w-0">
               <h3 className="text-ink font-medium truncate">{item.title}</h3>
               <p className="text-gold font-mono text-sm mt-1">{item.price.toLocaleString()} تومان</p>

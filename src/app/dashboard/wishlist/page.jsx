@@ -2,6 +2,8 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import ProductCard from "../../components/ProductCard";
+import EmptyState from "../../components/EmptyState";
+import { ProductGridSkeleton } from "../../components/Skeleton";
 
 export default function WishlistPage() {
   const [products, setProducts] = useState([]);
@@ -22,9 +24,15 @@ export default function WishlistPage() {
       </div>
 
       {loading ? (
-        <p className="text-ink-muted">در حال بارگذاری...</p>
+        <ProductGridSkeleton />
       ) : products.length === 0 ? (
-        <p className="text-ink-muted">هنوز محصولی به علاقه‌مندی‌ها اضافه نکرده‌اید.</p>
+        <EmptyState
+          icon="heart"
+          title="لیست علاقه‌مندی‌های شما خالی است"
+          text="محصولاتی که دوست دارید بعداً بخرید را با علامت قلب اینجا نگه دارید."
+          actionHref="/"
+          actionLabel="مشاهده محصولات"
+        />
       ) : (
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-5">
           {products.map((p) => (

@@ -7,6 +7,8 @@ import Link from "next/link";
 import ProductCard from "./components/ProductCard";
 import Reveal from "./components/Reveal";
 import RecentlyViewed from "./components/RecentlyViewed";
+import EmptyState from "./components/EmptyState";
+import { ProductGridSkeleton } from "./components/Skeleton";
 
 const faqs = [
   { q: "چگونه سفارش خود را ثبت کنم؟", a: "کالای مورد نظر را به سبد خرید اضافه کرده و در مرحله‌ی تسویه حساب، اطلاعات گیرنده را وارد و پرداخت را از طریق درگاه بانکی تکمیل کنید." },
@@ -96,13 +98,13 @@ function StoreBody() {
   return (
     <main>
       {/* Hero */}
-      <section className="relative overflow-hidden border-b border-base-line">
-        <div className="absolute inset-0 opacity-[0.08] pointer-events-none">
+      <section className="relative overflow-hidden border-b border-base-line bg-gradient-to-b from-gold-soft/15 via-base to-teal/10">
+        <div className="absolute inset-0 opacity-[0.16] pointer-events-none">
           <CascadePattern />
         </div>
-        <div className="float absolute -top-10 left-[8%] w-40 h-40 rounded-full bg-gold-soft/30 blur-3xl pointer-events-none" />
-        <div className="float-delay absolute top-24 right-[10%] w-56 h-56 rounded-full bg-teal/20 blur-3xl pointer-events-none" />
-        <div className="float absolute bottom-0 left-[35%] w-32 h-32 rounded-full bg-gold/25 blur-3xl pointer-events-none" />
+        <div className="float absolute -top-10 left-[8%] w-56 h-56 rounded-full bg-gold-soft/50 blur-3xl pointer-events-none" />
+        <div className="float-delay absolute top-24 right-[10%] w-72 h-72 rounded-full bg-teal/35 blur-3xl pointer-events-none" />
+        <div className="float absolute bottom-0 left-[35%] w-48 h-48 rounded-full bg-gold/40 blur-3xl pointer-events-none" />
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 py-20 sm:py-28">
           <p className="font-mono text-gold text-xs tracking-[0.3em] mb-4">DIAMOND KALA / BEAUTY &amp; CARE</p>
           <h1 className="font-display text-4xl sm:text-5xl text-ink max-w-2xl leading-tight mb-6">
@@ -169,7 +171,7 @@ function StoreBody() {
 
         <div className="grid grid-cols-1 lg:grid-cols-5 gap-8">
           {/* Filter sidebar */}
-          <aside className="lg:col-span-1 space-y-6 h-fit bg-base-panel border border-base-line rounded-sm p-5">
+          <aside className="pastel-card lg:col-span-1 space-y-6 h-fit bg-gradient-to-b from-gold-soft/10 via-base-panel to-teal/5 border border-base-line p-5">
             <div>
               <h3 className="text-ink text-sm font-semibold mb-3">مرتب‌سازی</h3>
               <select
@@ -240,9 +242,13 @@ function StoreBody() {
           {/* Grid */}
           <div className="lg:col-span-4">
             {loading ? (
-              <p className="text-ink-muted text-center py-16">در حال بارگذاری محصولات...</p>
+              <ProductGridSkeleton count={8} />
             ) : visible.length === 0 ? (
-              <p className="text-ink-muted text-center py-16">محصولی مطابق فیلترهای انتخابی یافت نشد.</p>
+              <EmptyState
+                icon="search"
+                title="محصولی یافت نشد"
+                text="فیلترها یا عبارت جستجو را تغییر دهید و دوباره امتحان کنید."
+              />
             ) : (
               <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-5">
                 {visible.map((product) => (
@@ -346,7 +352,7 @@ function NewsletterForm() {
 
 function TrustBadge({ title, text }) {
   return (
-    <div className="border border-base-line rounded-sm p-4 text-center bg-base-panel">
+    <div className="pastel-card border border-base-line p-4 text-center bg-gradient-to-br from-gold-soft/20 via-base-panel to-teal/10">
       <p className="text-gold font-display text-sm mb-1">{title}</p>
       <p className="text-ink-faint text-xs">{text}</p>
     </div>

@@ -19,17 +19,18 @@ const cartSlice = createSlice({
     addToCart(state, action) {
       const item = action.payload;
       const id = item._id || item.id;
+      const qty = item.quantity && item.quantity > 0 ? item.quantity : 1;
       const existingItem = state.items.find((i) => i.id === id);
 
       if (existingItem) {
-        existingItem.quantity += 1;
+        existingItem.quantity += qty;
       } else {
         state.items.push({
           id,
           title: item.name || item.title,
           price: item.price,
           image: item.image || item.images?.[0],
-          quantity: 1,
+          quantity: qty,
         });
       }
       recalc(state);

@@ -6,6 +6,7 @@ import { PersistGate } from "redux-persist/integration/react";
 import { useEffect } from "react";
 import { store, persistor } from "@/redux/store";
 import { setCartOwner } from "@/redux/cartSlice";
+import { ToastProvider } from "./components/Toast";
 
 /**
  * Watches the NextAuth session and keeps the cart's ownerId in sync.
@@ -32,7 +33,7 @@ export function Providers({ children }) {
       <Provider store={store}>
         <PersistGate loading={null} persistor={persistor}>
           <CartOwnerSync />
-          {children}
+          <ToastProvider>{children}</ToastProvider>
         </PersistGate>
       </Provider>
     </SessionProvider>

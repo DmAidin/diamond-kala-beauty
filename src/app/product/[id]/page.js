@@ -5,18 +5,22 @@ import { useDispatch } from "react-redux";
 import { addToCart } from "@/redux/cartSlice";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
+import Image from "next/image";
 import RecentlyViewed, { trackProductView } from "@/app/components/RecentlyViewed";
 import ProductCard from "@/app/components/ProductCard";
+import { useToast } from "@/app/components/Toast";
 
 export default function ProductDetailPage({ params }) {
   const { id } = usePromise(params);
   const { data: session } = useSession();
+  const showToast = useToast();
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [added, setAdded] = useState(false);
   const [wished, setWished] = useState(false);
   const [activeImage, setActiveImage] = useState(0);
+  const [zoomOpen, setZoomOpen] = useState(false);
+  const [qty, setQty] = useState(1);
   const [reviews, setReviews] = useState([]);
   const [average, setAverage] = useState(0);
   const [reviewCount, setReviewCount] = useState(0);
@@ -64,9 +68,9 @@ export default function ProductDetailPage({ params }) {
   }, [session, id]);
 
   const handleAdd = () => {
-    dispatch(addToCart(product));
-    setAdded(true);
-    setTimeout(() => setAdded(false), 1500);
+    dispatch(addToCart({ ...product, quantity: qty }));
+    showToast(`${product.name} به سبد خرید اضافه شد`);
+    setQty(1);
   };
 
   const toggleWishlist = async () => {
@@ -78,6 +82,7 @@ export default function ProductDetailPage({ params }) {
     });
     const data = await res.json();
     setWished(data.added);
+    showToast(data.added ? "به علاقه‌مندی‌ها اضافه شد" : "از علاقه‌مندی‌ها حذف شد");
   };
 
   const submitReview = async (e) => {
@@ -96,6 +101,7 @@ export default function ProductDetailPage({ params }) {
         setAverage(refreshed.average || 0);
         setReviewCount(refreshed.count || 0);
         setMyText("");
+        showToast("نظر شما ثبت شد");
       }
     } finally {
       setSubmittingReview(false);
@@ -103,7 +109,19 @@ export default function ProductDetailPage({ params }) {
   };
 
   if (loading) {
-    return <main className="max-w-6xl mx-auto px-4 py-24 text-center text-ink-muted">در حال بارگذاری...</main>;
+    return (
+      <main className="max-w-6xl mx-auto px-4 sm:px-6 py-12 animate-pulse">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
+          <div className="h-96 rounded-sm bg-base-panel" />
+          <div className="space-y-4">
+            <div className="h-6 w-2/3 rounded bg-base-panel" />
+            <div className="h-4 w-1/3 rounded bg-base-panel" />
+            <div className="h-20 rounded bg-base-panel" />
+            <div className="h-10 w-1/2 rounded bg-base-panel" />
+          </div>
+        </div>
+      </main>
+    );
   }
 
   if (error || !product) {
@@ -117,13 +135,15 @@ export default function ProductDetailPage({ params }) {
 
   const specs = product.specs ? Object.entries(product.specs) : [];
   const inStock = (product.stock ?? 0) > 0;
+  const gallery = product.images && product.images.length > 0 ? product.images : [product.image].filter(Boolean);
+  const currentImage = gallery[activeImage] || gallery[0];
 
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "Product",
     name: product.name,
     description: product.description,
-    image: product.images?.[0] || product.image,
+    image: gallery[0],
     brand: product.brand || undefined,
     offers: {
       "@type": "Offer",
@@ -144,6 +164,24 @@ export default function ProductDetailPage({ params }) {
     <main className="max-w-6xl mx-auto px-4 sm:px-6 py-12">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
 
+      {zoomOpen && currentImage && (
+        <div
+          onClick={() => setZoomOpen(false)}
+          className="fixed inset-0 z-[80] bg-black/85 flex items-center justify-center p-6 cursor-zoom-out"
+        >
+          <div className="relative w-full max-w-2xl h-full max-h-[85vh]">
+            <Image src={currentImage} alt={product.name} fill sizes="90vw" className="object-contain" />
+          </div>
+          <button
+            onClick={() => setZoomOpen(false)}
+            className="absolute top-6 left-6 w-10 h-10 rounded-full bg-white/10 text-white flex items-center justify-center"
+            aria-label="بستن"
+          >
+            ✕
+          </button>
+        </div>
+      )}
+
       <nav className="text-xs text-ink-faint mb-8 font-mono">
         <Link href="/" className="hover:text-gold">فروشگاه</Link>
         <span className="mx-2">/</span>
@@ -154,34 +192,44 @@ export default function ProductDetailPage({ params }) {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
         <div>
-          <div className="pastel-card opal-shimmer bg-gradient-to-br from-gold-soft/15 via-base-panel to-teal/10 border border-base-line p-10 flex items-center justify-center relative">
-            <img
-              src={(product.images && product.images[activeImage]) || product.image}
-              alt={product.name}
-              className="max-h-96 object-contain"
-            />
+          <button
+            onClick={() => setZoomOpen(true)}
+            className="pastel-card opal-shimmer relative w-full aspect-square bg-gradient-to-br from-gold-soft/15 via-base-panel to-teal/10 border border-base-line cursor-zoom-in block"
+            aria-label="بزرگ‌نمایی تصویر"
+          >
+            {currentImage && (
+              <Image src={currentImage} alt={product.name} fill sizes="(max-width: 1024px) 90vw, 45vw" className="object-contain p-8" />
+            )}
             {session && (
-              <button
-                onClick={toggleWishlist}
+              <span
+                role="button"
+                tabIndex={0}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  toggleWishlist();
+                }}
                 aria-label="افزودن به علاقه‌مندی‌ها"
                 className="absolute top-4 left-4 w-10 h-10 rounded-full bg-base border border-base-line flex items-center justify-center hover:border-gold transition-colors"
               >
                 <HeartGlyph filled={wished} />
-              </button>
+              </span>
             )}
-          </div>
+            <span className="absolute bottom-3 right-3 text-[11px] bg-base/90 border border-base-line rounded-full px-3 py-1 text-ink-muted">
+              برای بزرگ‌نمایی کلیک کنید 🔍
+            </span>
+          </button>
 
-          {product.images && product.images.length > 1 && (
+          {gallery.length > 1 && (
             <div className="flex gap-3 mt-4 overflow-x-auto pb-1">
-              {product.images.map((src, idx) => (
+              {gallery.map((src, idx) => (
                 <button
                   key={idx}
                   onClick={() => setActiveImage(idx)}
-                  className={`shrink-0 w-16 h-16 rounded-sm border p-1 bg-base-panel transition-colors ${
+                  className={`relative shrink-0 w-16 h-16 rounded-sm border p-1 bg-base-panel transition-colors ${
                     idx === activeImage ? "border-gold" : "border-base-line hover:border-gold/50"
                   }`}
                 >
-                  <img src={src} alt={`${product.name} ${idx + 1}`} className="w-full h-full object-contain" />
+                  <Image src={src} alt={`${product.name} ${idx + 1}`} fill sizes="64px" className="object-contain p-1" />
                 </button>
               ))}
             </div>
@@ -223,12 +271,22 @@ export default function ProductDetailPage({ params }) {
             )}
           </div>
 
+          {inStock && (
+            <div className="flex items-center gap-3 mb-5">
+              <div className="flex items-center border border-base-line rounded-sm">
+                <button onClick={() => setQty((q) => Math.max(1, q - 1))} className="w-10 h-10 text-ink-muted hover:text-gold" aria-label="کم کردن تعداد">−</button>
+                <span className="w-8 text-center font-mono text-ink">{qty}</span>
+                <button onClick={() => setQty((q) => Math.min(product.stock, q + 1))} className="w-10 h-10 text-ink-muted hover:text-gold" aria-label="زیاد کردن تعداد">+</button>
+              </div>
+            </div>
+          )}
+
           <button
             onClick={handleAdd}
             disabled={!inStock}
             className="w-full sm:w-auto px-8 py-3 rounded-sm bg-gold text-base font-bold hover:bg-gold-soft transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
           >
-            {added ? "به سبد اضافه شد ✓" : "افزودن به سبد خرید"}
+            افزودن به سبد خرید
           </button>
 
           {specs.length > 0 && (

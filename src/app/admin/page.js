@@ -7,6 +7,7 @@ import { connectToDB } from "../../utils/database";
 import Product from "../../models/product";
 import Order from "../../models/order";
 import PageView from "../../models/pageView";
+import { tehranDateKey } from "../../utils/dateUtils";
 
 export default async function AdminDashboardPage() {
   const session = await getServerSession(authOptions);
@@ -14,10 +15,7 @@ export default async function AdminDashboardPage() {
   if (session.user.role !== "admin") redirect("/auth/unauthorized");
 
   await connectToDB();
-  const todayKey = (() => {
-    const now = new Date();
-    return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}`;
-  })();
+  const todayKey = tehranDateKey();
 
   const [usersCount, productsCount, ordersCount, revenueAgg, lowStock, todayViews] = await Promise.all([
     prisma.user.count(),
@@ -33,7 +31,7 @@ export default async function AdminDashboardPage() {
   for (let i = 6; i >= 0; i--) {
     const d = new Date();
     d.setDate(d.getDate() - i);
-    last7Days.push(`${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`);
+    last7Days.push(tehranDateKey(d));
   }
   const viewRecords = await PageView.find({ date: { $in: last7Days } });
   const viewMap = Object.fromEntries(viewRecords.map((r) => [r.date, r.count]));

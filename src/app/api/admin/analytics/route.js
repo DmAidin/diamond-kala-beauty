@@ -2,6 +2,7 @@ import { getServerSession } from "next-auth/next";
 import { authOptions } from "../../auth/[...nextauth]/route";
 import { connectToDB } from "../../../../utils/database";
 import PageView from "../../../../models/pageView";
+import { tehranDateKey } from "../../../../utils/dateUtils";
 
 // GET: today's visit count plus the last 7 days, admin-only
 export async function GET() {
@@ -16,10 +17,7 @@ export async function GET() {
   for (let i = 6; i >= 0; i--) {
     const d = new Date();
     d.setDate(d.getDate() - i);
-    const y = d.getFullYear();
-    const m = String(d.getMonth() + 1).padStart(2, "0");
-    const day = String(d.getDate()).padStart(2, "0");
-    days.push(`${y}-${m}-${day}`);
+    days.push(tehranDateKey(d));
   }
 
   const records = await PageView.find({ date: { $in: days } });

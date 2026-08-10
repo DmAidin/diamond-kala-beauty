@@ -2,6 +2,8 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import EmptyState from "../../components/EmptyState";
+import { ListSkeleton, OrderRowSkeleton } from "../../components/Skeleton";
 
 const statusMap = {
   pending: { label: "در انتظار پرداخت", cls: "text-signal-warn border-signal-warn" },
@@ -34,9 +36,15 @@ export default function OrdersPage() {
       </div>
 
       {loading ? (
-        <p className="text-ink-muted">در حال بارگذاری...</p>
+        <ListSkeleton rows={3} Row={OrderRowSkeleton} />
       ) : orders.length === 0 ? (
-        <p className="text-ink-muted">هنوز سفارشی ثبت نکرده‌اید.</p>
+        <EmptyState
+          icon="box"
+          title="هنوز سفارشی ثبت نکرده‌اید"
+          text="بعد از اولین خرید، سفارش‌هایتان اینجا نمایش داده می‌شود."
+          actionHref="/"
+          actionLabel="مشاهده محصولات"
+        />
       ) : (
         <div className="space-y-4">
           {orders.map((order) => {
