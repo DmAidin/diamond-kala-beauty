@@ -4,24 +4,20 @@ import { useState, useEffect, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
+import Image from "next/image";
 import ProductCard from "./components/ProductCard";
 import Reveal from "./components/Reveal";
 import RecentlyViewed from "./components/RecentlyViewed";
 import EmptyState from "./components/EmptyState";
 import { ProductGridSkeleton } from "./components/Skeleton";
 import ProductCarousel from "./components/ProductCarousel";
+import { CATEGORY_IMAGES } from "./categoryImages";
 
 const faqs = [
   { q: "چگونه سفارش خود را ثبت کنم؟", a: "کالای مورد نظر را به سبد خرید اضافه کرده و در مرحله‌ی تسویه حساب، اطلاعات گیرنده را وارد و پرداخت را از طریق درگاه بانکی تکمیل کنید." },
   { q: "روش‌های پرداخت چیست؟", a: "پرداخت به‌صورت آنلاین و از طریق درگاه بانکی معتبر و رمزنگاری‌شده انجام می‌شود." },
   { q: "زمان ارسال سفارش چقدر است؟", a: "سفارش‌ها معمولاً ۲ تا ۴ روز کاری پس از تایید پرداخت ارسال می‌شوند و کد رهگیری از طریق پنل کاربری در دسترس قرار می‌گیرد." },
   { q: "آیا امکان مرجوعی کالا وجود دارد؟", a: "در صورت عدم مطابقت کالا با سفارش، طبق شرایط مرجوعی امکان بازگرداندن کالا وجود دارد." },
-];
-
-const testimonials = [
-  { name: "سارا محمدی", text: "بسته‌بندی خیلی شیک و مراقبت‌شده بود، محصول هم کاملاً اورجینال و همون چیزی بود که سفارش دادم." },
-  { name: "نگین رضایی", text: "تنوع برندها عالیه و قیمت‌ها منصفانه‌ست، تجربه‌ی خریدم خیلی لذت‌بخش بود." },
-  { name: "آیدا کریمی", text: "پشتیبانی سریع جواب داد و سفارشم زودتر از موعد اعلام‌شده رسید." },
 ];
 
 function StoreBody() {
@@ -152,20 +148,38 @@ function StoreBody() {
         <Reveal className="max-w-7xl mx-auto px-4 sm:px-6 py-10">
           <h2 className="font-display text-2xl text-ink mb-6">دسته‌بندی محصولات</h2>
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
-            {categories.map((c) => (
-              <Link
-                key={c}
-                href={`/?category=${encodeURIComponent(c)}`}
-                className={`pastel-card group border p-5 text-center transition-colors ${
-                  activeCategory === c ? "border-gold bg-gold/10" : "border-base-line bg-base-panel hover:border-gold/50"
-                }`}
-              >
-                <span className="block w-10 h-10 mx-auto mb-3 rounded-full border border-gold/50 flex items-center justify-center text-gold font-display group-hover:bg-gold/10">
-                  {c.charAt(0)}
-                </span>
-                <span className="text-sm text-ink">{c}</span>
-              </Link>
-            ))}
+            {categories.map((c) => {
+              const img = CATEGORY_IMAGES[c];
+              return (
+                <Link key={c} href={`/category/${encodeURIComponent(c)}`} className="group block">
+                  {img ? (
+                    <div className="relative rounded-2xl overflow-hidden border border-base-line">
+                      <Image
+                        src={img}
+                        alt={c}
+                        width={655}
+                        height={610}
+                        sizes="(max-width: 640px) 45vw, (max-width: 1024px) 30vw, 18vw"
+                        className="w-full h-auto group-hover:scale-105 transition-transform duration-500"
+                      />
+                      <span className="absolute bottom-3 right-3 flex items-center gap-1.5 bg-base/95 text-ink text-xs px-3 py-1.5 rounded-full border border-base-line">
+                        {c}
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-gold">
+                          <path d="M15 6l-6 6 6 6" />
+                        </svg>
+                      </span>
+                    </div>
+                  ) : (
+                    <div className="pastel-card border border-base-line bg-base-panel hover:border-gold/50 p-5 text-center transition-colors">
+                      <span className="block w-10 h-10 mx-auto mb-3 rounded-full border border-gold/50 flex items-center justify-center text-gold font-display group-hover:bg-gold/10">
+                        {c.charAt(0)}
+                      </span>
+                      <span className="text-sm text-ink">{c}</span>
+                    </div>
+                  )}
+                </Link>
+              );
+            })}
           </div>
         </Reveal>
       )}
@@ -280,19 +294,6 @@ function StoreBody() {
       </section>
 
       <RecentlyViewed />
-
-      {/* Testimonials */}
-      <Reveal className="max-w-7xl mx-auto px-4 sm:px-6 py-20">
-        <h2 className="font-display text-2xl text-ink mb-8 text-center">نظر مشتریان دایمند کالا</h2>
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
-          {testimonials.map((t, i) => (
-            <div key={i} className="pastel-card bg-base-panel border border-base-line p-6">
-              <p className="text-ink-muted text-sm leading-7 mb-4">«{t.text}»</p>
-              <p className="text-gold text-sm font-medium">{t.name}</p>
-            </div>
-          ))}
-        </div>
-      </Reveal>
 
       {/* Newsletter */}
       <Reveal className="border-y border-base-line bg-base-panel">

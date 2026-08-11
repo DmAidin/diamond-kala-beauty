@@ -58,7 +58,7 @@ export default function ProductCard({ product, wishlistIds }) {
             {product.category}
           </span>
         )}
-        <div className="opal-shimmer relative h-40 mb-4 bg-gradient-to-br from-gold-soft/25 via-base-raised to-teal/15 rounded-sm overflow-hidden">
+        <div className="opal-shimmer relative h-40 mb-4 bg-white rounded-sm overflow-hidden">
           {image && (
             <Image
               src={image}
@@ -91,15 +91,15 @@ export default function ProductCard({ product, wishlistIds }) {
       )}
 
       {inStock ? (
-        <div className="mt-4 flex items-center gap-2">
-          <div className="flex items-center border border-base-line rounded-sm">
-            <button onClick={(e) => changeQty(e, -1)} className="w-8 h-8 text-ink-muted hover:text-gold" aria-label="کم کردن تعداد">−</button>
+        <div className="mt-4 flex flex-wrap items-center gap-2">
+          <div className="flex items-center border border-base-line rounded-sm shrink-0">
+            <button onClick={(e) => changeQty(e, -1)} className="w-7 h-8 text-ink-muted hover:text-gold" aria-label="کم کردن تعداد">−</button>
             <span className="w-6 text-center text-sm font-mono text-ink">{qty}</span>
-            <button onClick={(e) => changeQty(e, 1)} className="w-8 h-8 text-ink-muted hover:text-gold" aria-label="زیاد کردن تعداد">+</button>
+            <button onClick={(e) => changeQty(e, 1)} className="w-7 h-8 text-ink-muted hover:text-gold" aria-label="زیاد کردن تعداد">+</button>
           </div>
           <button
             onClick={handleAdd}
-            className="flex-1 py-2 rounded-sm border border-gold/60 text-gold text-sm hover:bg-gold hover:text-base transition-colors"
+            className="flex-1 min-w-[6.5rem] py-2 rounded-sm border border-gold/60 text-gold text-xs sm:text-sm hover:bg-gold hover:text-base transition-colors"
           >
             افزودن به سبد
           </button>

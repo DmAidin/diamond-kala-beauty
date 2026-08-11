@@ -84,6 +84,11 @@ function LoginForm() {
             {formik.touched.password && formik.errors.password && (
               <p className="mt-1 text-signal-bad text-xs">{formik.errors.password}</p>
             )}
+            <div className="text-left mt-2">
+              <Link href="/auth/forgot-password" className="text-xs text-gold hover:underline">
+                رمز عبور را فراموش کرده‌اید؟
+              </Link>
+            </div>
           </div>
 
           <button

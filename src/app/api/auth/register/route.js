@@ -1,6 +1,7 @@
 import { hash } from "bcryptjs";
 import prisma from "../../../lib/prisma";
 import { rateLimit, getClientIp } from "../../../../utils/rateLimit";
+import { isValidEmail } from "../../../../utils/validate";
 
 export async function POST(req) {
   try {
@@ -19,6 +20,18 @@ export async function POST(req) {
     if (!name || !email || !password) {
       return new Response(
         JSON.stringify({ message: "همه فیلدها الزامی‌اند" }),
+        { status: 400 }
+      );
+    }
+    if (!isValidEmail(email)) {
+      return new Response(
+        JSON.stringify({ message: "ایمیل وارد‌شده معتبر نیست" }),
+        { status: 400 }
+      );
+    }
+    if (password.length < 6) {
+      return new Response(
+        JSON.stringify({ message: "رمز عبور باید حداقل ۶ کاراکتر باشد" }),
         { status: 400 }
       );
     }

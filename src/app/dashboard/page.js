@@ -4,7 +4,7 @@ import { redirect } from "next/navigation";
 import Link from "next/link";
 import { connectToDB } from "../../utils/database";
 import Order from "../../models/order";
-import DashboardAccountActions from "../components/DashboardAccountActions";
+import DashboardNav from "../components/DashboardNav";
 
 export default async function DashboardPage() {
   const session = await getServerSession(authOptions);
@@ -19,21 +19,7 @@ export default async function DashboardPage() {
     <main className="max-w-6xl mx-auto px-4 sm:px-6 py-12">
       <div className="flex flex-col sm:flex-row gap-8">
         <aside className="w-full sm:w-56 shrink-0">
-          <nav className="flex flex-wrap sm:flex-col gap-2 text-sm">
-            <Link href="/dashboard" className="px-4 py-2 rounded-sm bg-base-panel border border-gold/50 text-gold">
-              داشبورد
-            </Link>
-            <Link href="/dashboard/orders" className="px-4 py-2 rounded-sm border border-base-line text-ink-muted hover:border-gold/50">
-              سفارش‌ها
-            </Link>
-            <Link href="/dashboard/wishlist" className="px-4 py-2 rounded-sm border border-base-line text-ink-muted hover:border-gold/50">
-              علاقه‌مندی‌ها
-            </Link>
-            <Link href="/dashboard/profile" className="px-4 py-2 rounded-sm border border-base-line text-ink-muted hover:border-gold/50">
-              پروفایل
-            </Link>
-            <DashboardAccountActions isAdmin={session.user.role === "admin"} />
-          </nav>
+          <DashboardNav isAdmin={session.user.role === "admin"} />
         </aside>
 
         <div className="flex-1 space-y-8">

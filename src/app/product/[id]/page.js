@@ -194,7 +194,7 @@ export default function ProductDetailPage({ params }) {
         <div>
           <button
             onClick={() => setZoomOpen(true)}
-            className="pastel-card opal-shimmer relative w-full aspect-square bg-gradient-to-br from-gold-soft/15 via-base-panel to-teal/10 border border-base-line cursor-zoom-in block"
+            className="pastel-card opal-shimmer relative w-full aspect-square bg-white border border-base-line cursor-zoom-in block"
             aria-label="بزرگ‌نمایی تصویر"
           >
             {currentImage && (

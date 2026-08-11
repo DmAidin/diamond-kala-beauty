@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { useSelector } from "react-redux";
 import ThemeToggle from "./ThemeToggle";
+import { CATEGORY_IMAGES } from "../categoryImages";
 
 export default function Navbar() {
   const { data: session, status } = useSession();
@@ -62,13 +63,10 @@ export default function Navbar() {
       <div className="trace-line" />
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
         <div className="flex items-center gap-6 lg:gap-10 h-28 lg:h-36">
-          <Link href="/" className="flex items-center gap-2 shrink-0">
-            <div className="relative w-24 h-24 lg:w-32 lg:h-32">
-              <Image src="/logo.png" alt="دایمند کالا" fill sizes="128px" className="object-contain" priority />
+          <Link href="/" className="flex items-center justify-center flex-1 md:flex-none shrink-0">
+            <div className="relative w-40 h-16 sm:w-48 sm:h-20 lg:w-56 lg:h-24">
+              <Image src="/new-logo.png" alt="دایمند کالا" fill sizes="224px" className="object-contain" priority />
             </div>
-            <span className="font-display text-lg tracking-wide text-ink hidden sm:inline">
-              دایمند کالا
-            </span>
           </Link>
 
           {/* search + category nav + login state: desktop/tablet only —
@@ -111,7 +109,7 @@ export default function Navbar() {
             {categories.slice(0, 5).map((c) => (
               <Link
                 key={c}
-                href={`/?category=${encodeURIComponent(c)}`}
+                href={`/category/${encodeURIComponent(c)}`}
                 className="hover:text-gold transition-colors whitespace-nowrap"
               >
                 {c}
@@ -145,7 +143,13 @@ export default function Navbar() {
                     پنل مدیریت
                   </Link>
                 )}
-                <Link href="/dashboard" className="text-sm text-ink hover:text-gold transition-colors">
+                <Link
+                  href="/dashboard"
+                  className="flex items-center gap-2 text-sm text-ink border border-base-line rounded-sm px-3 py-2 hover:border-gold hover:text-gold transition-colors"
+                >
+                  <span className="w-6 h-6 rounded-full bg-gold-soft/30 border border-gold/40 text-gold flex items-center justify-center font-display text-xs shrink-0">
+                    {(session.user.name || session.user.email || "؟").charAt(0)}
+                  </span>
                   {session.user.name || session.user.email}
                 </Link>
               </div>
@@ -216,12 +220,18 @@ export default function Navbar() {
               {categories.map((c) => (
                 <Link
                   key={c}
-                  href={`/?category=${encodeURIComponent(c)}`}
+                  href={`/category/${encodeURIComponent(c)}`}
                   className="shrink-0 flex flex-col items-center gap-1.5 w-16"
                 >
-                  <span className="w-12 h-12 rounded-full bg-gradient-to-br from-gold-soft/30 to-teal/20 border border-base-line flex items-center justify-center text-gold font-display text-sm">
-                    {c.charAt(0)}
-                  </span>
+                  {CATEGORY_IMAGES[c] ? (
+                    <span className="relative w-12 h-12 rounded-full overflow-hidden border border-base-line">
+                      <Image src={CATEGORY_IMAGES[c]} alt={c} fill sizes="48px" className="object-cover" />
+                    </span>
+                  ) : (
+                    <span className="w-12 h-12 rounded-full bg-gradient-to-br from-gold-soft/30 to-teal/20 border border-base-line flex items-center justify-center text-gold font-display text-sm">
+                      {c.charAt(0)}
+                    </span>
+                  )}
                   <span className="text-[10px] text-ink-muted text-center leading-tight line-clamp-2">{c}</span>
                 </Link>
               ))}
