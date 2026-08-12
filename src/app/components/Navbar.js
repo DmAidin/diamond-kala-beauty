@@ -62,10 +62,16 @@ export default function Navbar() {
     <header className="relative md:sticky md:top-0 z-40 bg-base/95 backdrop-blur border-b border-base-line">
       <div className="trace-line" />
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
-        <div className="flex items-center gap-6 lg:gap-10 h-28 lg:h-36">
-          <Link href="/" className="flex items-center justify-center flex-1 md:flex-none shrink-0">
-            <div className="relative w-40 h-16 sm:w-48 sm:h-20 lg:w-56 lg:h-24">
-              <Image src="/new-logo.png" alt="دایمند کالا" fill sizes="224px" className="object-contain" priority />
+        <div className="flex items-center gap-4 lg:gap-6 h-28 lg:h-36">
+          <Link href="/" className="shrink-0" aria-label="دایمند کالا">
+            <div className="relative w-12 h-12 sm:w-14 sm:h-14">
+              <Image src="/logo.png" alt="" fill sizes="56px" className="object-contain" />
+            </div>
+          </Link>
+
+          <Link href="/" className="mx-auto shrink-0" aria-label="دایمند کالا">
+            <div className="relative w-40 h-16 sm:w-56 sm:h-20 lg:w-72 lg:h-24">
+              <Image src="/new-logo.png" alt="دایمند کالا" fill sizes="288px" className="object-contain" priority />
             </div>
           </Link>
 
@@ -216,19 +222,25 @@ export default function Navbar() {
           )}
 
           {categories.length > 0 && (
-            <div className="flex gap-2 overflow-x-auto pb-1 -mx-4 px-4">
+            <div className="flex gap-3 overflow-x-auto pb-1 -mx-4 px-4">
               {categories.map((c) => (
                 <Link
                   key={c}
                   href={`/category/${encodeURIComponent(c)}`}
-                  className="shrink-0 flex flex-col items-center gap-1.5 w-16"
+                  className="shrink-0 flex flex-col items-center gap-1.5 w-20"
                 >
                   {CATEGORY_IMAGES[c] ? (
-                    <span className="relative w-12 h-12 rounded-full overflow-hidden border border-base-line">
-                      <Image src={CATEGORY_IMAGES[c]} alt={c} fill sizes="48px" className="object-cover" />
+                    <span className="relative w-20 h-20">
+                      <Image
+                        src={CATEGORY_IMAGES[c].src}
+                        alt={c}
+                        fill
+                        sizes="80px"
+                        className="object-contain"
+                      />
                     </span>
                   ) : (
-                    <span className="w-12 h-12 rounded-full bg-gradient-to-br from-gold-soft/30 to-teal/20 border border-base-line flex items-center justify-center text-gold font-display text-sm">
+                    <span className="w-16 h-16 rounded-full bg-gradient-to-br from-gold-soft/30 to-teal/20 border border-base-line flex items-center justify-center text-gold font-display text-sm">
                       {c.charAt(0)}
                     </span>
                   )}

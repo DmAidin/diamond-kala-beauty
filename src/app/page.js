@@ -151,26 +151,23 @@ function StoreBody() {
             {categories.map((c) => {
               const img = CATEGORY_IMAGES[c];
               return (
-                <Link key={c} href={`/category/${encodeURIComponent(c)}`} className="group block">
+                <Link key={c} href={`/category/${encodeURIComponent(c)}`} className="group flex flex-col items-center">
                   {img ? (
-                    <div className="relative rounded-2xl overflow-hidden border border-base-line">
-                      <Image
-                        src={img}
-                        alt={c}
-                        width={655}
-                        height={610}
-                        sizes="(max-width: 640px) 45vw, (max-width: 1024px) 30vw, 18vw"
-                        className="w-full h-auto group-hover:scale-105 transition-transform duration-500"
-                      />
-                      <span className="absolute bottom-3 right-3 flex items-center gap-1.5 bg-base/95 text-ink text-xs px-3 py-1.5 rounded-full border border-base-line">
-                        {c}
-                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-gold">
-                          <path d="M15 6l-6 6 6 6" />
-                        </svg>
-                      </span>
-                    </div>
+                    <>
+                      <div className="relative w-full aspect-[4/5] flex items-end justify-center">
+                        <Image
+                          src={img.src}
+                          alt={c}
+                          width={img.width}
+                          height={img.height}
+                          sizes="(max-width: 640px) 45vw, (max-width: 1024px) 30vw, 18vw"
+                          className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-500"
+                        />
+                      </div>
+                      <span className="mt-2 text-sm text-ink group-hover:text-gold transition-colors">{c}</span>
+                    </>
                   ) : (
-                    <div className="pastel-card border border-base-line bg-base-panel hover:border-gold/50 p-5 text-center transition-colors">
+                    <div className="pastel-card w-full border border-base-line bg-base-panel hover:border-gold/50 p-5 text-center transition-colors">
                       <span className="block w-10 h-10 mx-auto mb-3 rounded-full border border-gold/50 flex items-center justify-center text-gold font-display group-hover:bg-gold/10">
                         {c.charAt(0)}
                       </span>
