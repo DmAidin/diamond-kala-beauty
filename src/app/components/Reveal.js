@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 
 // Fades + lifts a section into view the first time it scrolls into the
 // viewport. Pure IntersectionObserver, no animation library needed.
-export default function Reveal({ children, delay = 0, className = "" }) {
+export default function Reveal({ children, delay = 0, className = "", id }) {
   const ref = useRef(null);
   const [visible, setVisible] = useState(false);
 
@@ -27,6 +27,7 @@ export default function Reveal({ children, delay = 0, className = "" }) {
   return (
     <div
       ref={ref}
+      id={id}
       className={className}
       style={{
         opacity: visible ? 1 : 0,

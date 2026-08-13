@@ -114,24 +114,77 @@ function StoreBody() {
         <div className="absolute inset-0 opacity-[0.16] pointer-events-none">
           <CascadePattern />
         </div>
-        <div className="float absolute -top-10 left-[8%] w-56 h-56 rounded-full bg-gold-soft/50 blur-3xl pointer-events-none" />
-        <div className="float-delay absolute top-24 right-[10%] w-72 h-72 rounded-full bg-teal/35 blur-3xl pointer-events-none" />
-        <div className="float absolute bottom-0 left-[35%] w-48 h-48 rounded-full bg-gold/40 blur-3xl pointer-events-none" />
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 py-20 sm:py-28">
-          <p className="font-mono text-gold text-xs tracking-[0.3em] mb-4">DIAMOND KALA / BEAUTY &amp; CARE</p>
-          <h1 className="font-display text-4xl sm:text-5xl text-ink max-w-2xl leading-tight mb-6">
-            دایمند کالا؛ زیبایی و مراقبت، با اطمینان خرید کنید
-          </h1>
-          <p className="text-ink-muted max-w-xl leading-7 mb-8">
-            دایمند کالا مرجع خرید آنلاین لوازم آرایشی و بهداشتی اورجینال است؛ از مراقبت پوست و مو تا عطر و آرایش، با مشخصات شفاف، بسته‌بندی ویژه و ارسال سریع.
-          </p>
-          <div className="cascade-line max-w-xs mb-8" />
-          <a
-            href="#catalog"
-            className="inline-block px-7 py-3 rounded-sm bg-gold text-base font-bold hover:bg-gold-soft transition-colors"
-          >
-            مشاهده محصولات
-          </a>
+        <div className="float absolute -top-16 -left-16 w-72 h-72 sm:w-96 sm:h-96 rounded-full bg-gold-soft/50 blur-[90px] pointer-events-none" />
+        <div className="float-delay absolute top-1/3 -right-16 w-80 h-80 sm:w-[26rem] sm:h-[26rem] rounded-full bg-gold/35 blur-[100px] pointer-events-none" />
+        <div className="float absolute bottom-0 left-1/3 w-64 h-64 sm:w-80 sm:h-80 rounded-full bg-teal/30 blur-[80px] pointer-events-none" />
+
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 py-16 sm:py-24">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+            {/* Text column */}
+            <div className="lg:col-span-7 text-center lg:text-right">
+              <div className="inline-flex items-center gap-2 bg-base-panel/80 backdrop-blur-md border border-gold/30 px-4 py-1.5 rounded-full shadow-sm mb-6">
+                <span className="w-2 h-2 rounded-full bg-teal animate-pulse" />
+                <span className="text-xs font-bold text-gold-dim tracking-wide">مرجع تخصصی زیبایی و مراقبت اورجینال</span>
+              </div>
+
+              <h1 className="font-display text-4xl sm:text-5xl lg:text-6xl text-ink leading-[1.2] mb-6">
+                زیبایی، مراقبت و اصالت،
+                <br />
+                <span className="bg-gradient-to-l from-gold via-gold-dim to-teal bg-clip-text text-transparent">
+                  با دایمند کالا تجربه کنید
+                </span>
+              </h1>
+
+              <p className="text-ink-muted text-base sm:text-lg leading-relaxed max-w-xl mx-auto lg:mx-0 mb-8">
+                منتخبی از بهترین برندهای مراقبت پوست، مو و آرایشی اورجینال، با مشخصات شفاف، بسته‌بندی ویژه و ارسال سریع برای شما فراهم شده است.
+              </p>
+
+              <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4 mb-10">
+                <a
+                  href="#catalog"
+                  className="w-full sm:w-auto px-8 py-4 bg-gradient-to-l from-gold to-gold-dim text-base font-bold rounded-2xl shadow-lg shadow-gold/30 hover:shadow-xl hover:scale-[1.02] transition-all text-center"
+                >
+                  مشاهده ویترین محصولات ←
+                </a>
+                <Link
+                  href="/#catalog-categories"
+                  className="w-full sm:w-auto px-7 py-4 bg-base-panel hover:bg-gold-soft/10 text-gold-dim font-bold rounded-2xl border border-gold/30 shadow-sm transition-all text-center"
+                >
+                  مشاهده دسته‌بندی‌ها
+                </Link>
+              </div>
+
+              <div className="pt-8 border-t border-base-line grid grid-cols-3 gap-4 max-w-lg mx-auto lg:mx-0">
+                <div className="text-center lg:text-right">
+                  <p className="text-2xl sm:text-3xl font-display text-ink">۱۰۰٪</p>
+                  <p className="text-xs text-ink-faint font-medium">تضمین اصالت کالا</p>
+                </div>
+                <div className="text-center lg:text-right border-x border-base-line px-2">
+                  <p className="text-2xl sm:text-3xl font-display text-gold">ارسال</p>
+                  <p className="text-xs text-ink-faint font-medium">سریع و مطمئن</p>
+                </div>
+                <div className="text-center lg:text-right">
+                  <p className="text-2xl sm:text-3xl font-display text-teal">۲۴/۷</p>
+                  <p className="text-xs text-ink-faint font-medium">پشتیبانی مستقیم</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Visual column */}
+            <div className="lg:col-span-5 relative hidden sm:block">
+              <div className="relative mx-auto max-w-sm lg:max-w-none">
+                <div className="absolute inset-0 bg-gradient-to-tr from-gold to-teal rounded-[2.5rem] rotate-3 scale-95 opacity-60 blur-sm" />
+                <div className="relative bg-base-panel p-8 rounded-[2.5rem] shadow-2xl border border-base-line flex items-center justify-center aspect-square">
+                  <div className="relative w-2/3 h-2/3">
+                    <Image src="/category-perfume.png" alt="محصولات دایمند کالا" fill sizes="320px" className="object-contain" />
+                  </div>
+                  <span className="absolute top-6 right-6 bg-base/90 backdrop-blur-md px-3 py-1.5 rounded-full text-xs font-bold text-ink shadow-md">
+                    🌸 منتخب دایمند کالا
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </section>
 
@@ -145,7 +198,7 @@ function StoreBody() {
 
       {/* Category grid */}
       {categories.length > 0 && (
-        <Reveal className="max-w-7xl mx-auto px-4 sm:px-6 py-10">
+        <Reveal id="catalog-categories" className="max-w-7xl mx-auto px-4 sm:px-6 py-10">
           <h2 className="font-display text-2xl text-ink mb-6">دسته‌بندی محصولات</h2>
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
             {categories.map((c) => {

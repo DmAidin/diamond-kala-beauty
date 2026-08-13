@@ -62,16 +62,13 @@ export default function Navbar() {
     <header className="relative md:sticky md:top-0 z-40 bg-base/95 backdrop-blur border-b border-base-line">
       <div className="trace-line" />
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
-        <div className="flex items-center gap-4 lg:gap-6 h-28 lg:h-36">
-          <Link href="/" className="shrink-0" aria-label="دایمند کالا">
-            <div className="relative w-12 h-12 sm:w-14 sm:h-14">
-              <Image src="/logo.png" alt="" fill sizes="56px" className="object-contain" />
+        <div className="flex items-center gap-4 lg:gap-6 h-32 lg:h-44">
+          <Link href="/" className="flex items-center gap-3 shrink-0" aria-label="دایمند کالا">
+            <div className="relative w-20 h-20 sm:w-24 sm:h-24 shrink-0">
+              <Image src="/logo.png" alt="" fill sizes="96px" className="object-contain" />
             </div>
-          </Link>
-
-          <Link href="/" className="mx-auto shrink-0" aria-label="دایمند کالا">
-            <div className="relative w-40 h-16 sm:w-56 sm:h-20 lg:w-72 lg:h-24">
-              <Image src="/new-logo.png" alt="دایمند کالا" fill sizes="288px" className="object-contain" priority />
+            <div className="relative w-56 h-20 sm:w-72 sm:h-24 lg:w-80 lg:h-28 shrink-0">
+              <Image src="/new-logo.png" alt="دایمند کالا" fill sizes="320px" className="object-contain" priority />
             </div>
           </Link>
 
@@ -85,7 +82,7 @@ export default function Navbar() {
                 onChange={(e) => setQuery(e.target.value)}
                 onFocus={() => setShowSuggestions(true)}
                 placeholder="جستجو در میان محصولات فروشگاه..."
-                className="w-full bg-base-panel border border-base-line rounded-sm px-4 py-2 text-sm text-ink focus:outline-none focus:border-gold"
+                className="w-full bg-base-panel border border-base-line rounded-sm px-4 py-2.5 text-sm text-ink focus:outline-none focus:border-gold"
               />
             </form>
 

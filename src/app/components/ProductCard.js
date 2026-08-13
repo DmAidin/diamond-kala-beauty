@@ -7,6 +7,7 @@ import { addToCart } from "@/redux/cartSlice";
 import { useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
 import { useToast } from "./Toast";
+import QuickViewModal from "./QuickViewModal";
 
 export default function ProductCard({ product, wishlistIds }) {
   const dispatch = useDispatch();
@@ -17,7 +18,7 @@ export default function ProductCard({ product, wishlistIds }) {
   const inStock = stock > 0;
   const lowStock = inStock && stock <= 5;
   const [wished, setWished] = useState(false);
-  const [qty, setQty] = useState(1);
+  const [quickView, setQuickView] = useState(false);
   const image = product.images?.[0] || product.image;
 
   useEffect(() => {
@@ -39,76 +40,74 @@ export default function ProductCard({ product, wishlistIds }) {
 
   const handleAdd = (e) => {
     e.preventDefault();
-    dispatch(addToCart({ ...product, quantity: qty }));
+    dispatch(addToCart({ ...product, quantity: 1 }));
     showToast(`${product.name} به سبد خرید اضافه شد`);
-    setQty(1);
-  };
-
-  const changeQty = (e, delta) => {
-    e.preventDefault();
-    e.stopPropagation();
-    setQty((q) => Math.max(1, Math.min(stock || 99, q + delta)));
   };
 
   return (
-    <div className="pastel-card group relative bg-base-panel border border-base-line p-5 hover:border-gold/60">
-      <Link href={`/product/${id}`} className="block">
-        {product.category && (
-          <span className="absolute top-4 left-4 text-[10px] font-mono tracking-widest text-ink-faint border border-base-line rounded-sm px-2 py-1 bg-base-panel z-10">
-            {product.category}
-          </span>
-        )}
-        <div className="opal-shimmer relative h-40 mb-4 bg-white rounded-sm overflow-hidden">
-          {image && (
-            <Image
-              src={image}
-              alt={product.name}
-              fill
-              sizes="(max-width: 640px) 45vw, (max-width: 1024px) 30vw, 20vw"
-              className="object-contain p-3 group-hover:scale-105 transition-transform duration-500"
-            />
-          )}
-        </div>
-
-        <h3 className="text-ink font-medium mb-1 line-clamp-1">{product.name}</h3>
-        {product.brand && <p className="text-ink-faint text-xs font-mono mb-2">{product.brand}</p>}
-        <div className="flex items-center gap-2">
-          <p className="text-gold font-mono font-bold">{product.price.toLocaleString()} تومان</p>
-          {lowStock && <span className="text-[10px] text-signal-warn">فقط {stock} عدد باقی‌مانده</span>}
-        </div>
-      </Link>
-
-      {session && (
+    <>
+      <div className="group relative bg-base-panel rounded-3xl border border-base-line p-4 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between">
         <button
           onClick={toggleWishlist}
           aria-label="افزودن به علاقه‌مندی‌ها"
-          className="absolute top-4 right-4 w-8 h-8 rounded-full bg-base border border-base-line flex items-center justify-center hover:border-gold transition-colors z-10"
+          className={`absolute top-6 left-6 z-10 w-9 h-9 rounded-full bg-base-panel/90 backdrop-blur-md shadow-md flex items-center justify-center transition-transform hover:scale-110 ${
+            !session ? "hidden" : ""
+          }`}
         >
-          <svg width="14" height="14" viewBox="0 0 24 24" fill={wished ? "currentColor" : "none"} stroke="currentColor" strokeWidth="1.9" className={wished ? "text-signal-bad" : "text-ink"}>
+          <svg width="15" height="15" viewBox="0 0 24 24" fill={wished ? "currentColor" : "none"} stroke="currentColor" strokeWidth="1.9" className={wished ? "text-signal-bad" : "text-ink"}>
             <path d="M12 21s-7.5-4.7-10-9.3C.3 7.9 2.4 4 6.2 4c2 0 3.6 1.1 4.8 2.8C12.2 5.1 13.8 4 15.8 4c3.8 0 5.9 3.9 4.2 7.7C19.5 16.3 12 21 12 21Z" />
           </svg>
         </button>
-      )}
 
-      {inStock ? (
-        <div className="mt-4 flex flex-wrap items-center gap-2">
-          <div className="flex items-center border border-base-line rounded-sm shrink-0">
-            <button onClick={(e) => changeQty(e, -1)} className="w-7 h-8 text-ink-muted hover:text-gold" aria-label="کم کردن تعداد">−</button>
-            <span className="w-6 text-center text-sm font-mono text-ink">{qty}</span>
-            <button onClick={(e) => changeQty(e, 1)} className="w-7 h-8 text-ink-muted hover:text-gold" aria-label="زیاد کردن تعداد">+</button>
+        {lowStock && (
+          <span className="absolute top-6 right-6 z-10 bg-ink text-base text-[10px] font-bold px-2.5 py-1 rounded-full shadow-md">
+            فقط {stock} عدد
+          </span>
+        )}
+
+        <Link href={`/product/${id}`} className="block">
+          <div className="relative aspect-square rounded-2xl overflow-hidden bg-white mb-4">
+            {image && (
+              <Image
+                src={image}
+                alt={product.name}
+                fill
+                sizes="(max-width: 640px) 45vw, (max-width: 1024px) 30vw, 20vw"
+                className="object-contain p-3 group-hover:scale-105 transition-transform duration-500"
+              />
+            )}
+            <button
+              onClick={(e) => {
+                e.preventDefault();
+                setQuickView(true);
+              }}
+              className="absolute inset-x-3 bottom-3 py-2 bg-base-panel/90 backdrop-blur-md text-ink text-xs font-bold rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 shadow-md text-center"
+            >
+              👁️ مشاهده سریع
+            </button>
           </div>
+
+          {product.brand && (
+            <span className="text-[10px] font-bold text-gold uppercase tracking-wider">{product.brand}</span>
+          )}
+          <h3 className="text-xs sm:text-sm font-bold text-ink line-clamp-2 mt-1 leading-relaxed">{product.name}</h3>
+        </Link>
+
+        <div className="mt-4 pt-3 border-t border-base-line flex items-center justify-between">
+          <span className="text-sm font-black text-gold-dim">
+            {product.price.toLocaleString()} <span className="text-[10px] font-normal">تومان</span>
+          </span>
           <button
             onClick={handleAdd}
-            className="flex-1 min-w-[6.5rem] py-2 rounded-sm border border-gold/60 text-gold text-xs sm:text-sm hover:bg-gold hover:text-base transition-colors"
+            disabled={!inStock}
+            className="px-3.5 py-2 bg-gold hover:bg-gold-soft text-base rounded-xl shadow-md hover:shadow-lg transition-all text-xs font-bold disabled:opacity-40 disabled:cursor-not-allowed"
           >
-            افزودن به سبد
+            {inStock ? "+ خرید" : "ناموجود"}
           </button>
         </div>
-      ) : (
-        <button disabled className="mt-4 w-full py-2 rounded-sm border border-base-line text-ink-faint text-sm cursor-not-allowed">
-          ناموجود
-        </button>
-      )}
-    </div>
+      </div>
+
+      {quickView && <QuickViewModal product={product} onClose={() => setQuickView(false)} />}
+    </>
   );
 }
