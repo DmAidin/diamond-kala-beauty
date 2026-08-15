@@ -42,9 +42,10 @@ async function nextOrderNumber() {
   return `DK-${stamp}-${String(counter.seq).padStart(4, "0")}`;
 }
 
-// courier delivery flat fee, in Toman — enforced server-side so a client
-// can never submit a discounted or missing shipping charge
-const COURIER_FEE = 200000;
+// courier delivery is now collect-on-delivery — the courier collects the
+// shipping fee from the recipient in person, so it's never added to the
+// online payment total (only kept as metadata for the admin/receipt).
+const COURIER_FEE = 0;
 
 // POST: create a new pending order from the client-side cart.
 // Coupon is re-validated here server-side so a tampered client can't grant itself a discount.

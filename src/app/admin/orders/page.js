@@ -87,11 +87,13 @@ export default function AdminOrdersPage() {
                 ))}
                 <div className="spec-row">
                   <span className="text-ink-muted">روش تحویل</span>
-                  <span className="text-ink">{o.deliveryMethod === "pickup" ? "تحویل حضوری" : "ارسال با پیک"}</span>
+                  <span className="text-ink">{o.deliveryMethod === "pickup" ? "تحویل حضوری" : "ارسال با پیک (پس‌کرایه)"}</span>
                 </div>
                 <div className="spec-row">
                   <span className="text-ink-muted">هزینه ارسال</span>
-                  <span className="text-ink">{o.shippingCost > 0 ? `${o.shippingCost.toLocaleString()} تومان` : "رایگان"}</span>
+                  <span className="text-ink">
+                    {o.deliveryMethod === "pickup" ? "رایگان" : "پس‌کرایه — توسط گیرنده به پیک پرداخت می‌شود"}
+                  </span>
                 </div>
               </div>
 

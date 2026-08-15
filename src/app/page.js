@@ -111,9 +111,6 @@ function StoreBody() {
     <main>
       {/* Hero */}
       <section className="relative overflow-hidden border-b border-base-line bg-gradient-to-b from-gold-soft/15 via-base to-teal/10">
-        <div className="absolute inset-0 opacity-[0.16] pointer-events-none">
-          <CascadePattern />
-        </div>
         <div className="float absolute -top-16 -left-16 w-72 h-72 sm:w-96 sm:h-96 rounded-full bg-gold-soft/50 blur-[90px] pointer-events-none" />
         <div className="float-delay absolute top-1/3 -right-16 w-80 h-80 sm:w-[26rem] sm:h-[26rem] rounded-full bg-gold/35 blur-[100px] pointer-events-none" />
         <div className="float absolute bottom-0 left-1/3 w-64 h-64 sm:w-80 sm:h-80 rounded-full bg-teal/30 blur-[80px] pointer-events-none" />
@@ -174,9 +171,9 @@ function StoreBody() {
             <div className="lg:col-span-5 relative hidden sm:block">
               <div className="relative mx-auto max-w-sm lg:max-w-none">
                 <div className="absolute inset-0 bg-gradient-to-tr from-gold to-teal rounded-[2.5rem] rotate-3 scale-95 opacity-60 blur-sm" />
-                <div className="relative bg-base-panel p-8 rounded-[2.5rem] shadow-2xl border border-base-line flex items-center justify-center aspect-square">
-                  <div className="relative w-2/3 h-2/3">
-                    <Image src="/category-perfume.png" alt="محصولات دایمند کالا" fill sizes="320px" className="object-contain" />
+                <div className="relative bg-base-panel p-4 rounded-[2.5rem] shadow-2xl border border-base-line flex items-center justify-center aspect-square">
+                  <div className="relative w-full h-full">
+                    <Image src="/category-perfume.png" alt="محصولات دایمند کالا" fill sizes="380px" className="object-contain" />
                   </div>
                   <span className="absolute top-6 right-6 bg-base/90 backdrop-blur-md px-3 py-1.5 rounded-full text-xs font-bold text-ink shadow-md">
                     🌸 منتخب دایمند کالا
@@ -187,14 +184,6 @@ function StoreBody() {
           </div>
         </div>
       </section>
-
-      {/* Trust badges */}
-      <Reveal className="max-w-7xl mx-auto px-4 sm:px-6 py-10 grid grid-cols-2 sm:grid-cols-4 gap-4">
-        <TrustBadge title="۱۰۰٪ اورجینال" text="اصالت هر محصول تضمین می‌شود" />
-        <TrustBadge title="پرداخت امن" text="درگاه بانکی رمزنگاری‌شده" />
-        <TrustBadge title="بسته‌بندی ویژه" text="ارسال ایمن با بسته‌بندی مراقبت‌شده" />
-        <TrustBadge title="پشتیبانی مستقیم" text="پاسخ‌گویی به سوالات پیش و پس از خرید" />
-      </Reveal>
 
       {/* Category grid */}
       {categories.length > 0 && (
@@ -369,6 +358,14 @@ function StoreBody() {
           ))}
         </div>
       </Reveal>
+
+      {/* Trust badges */}
+      <Reveal className="max-w-7xl mx-auto px-4 sm:px-6 pb-20 grid grid-cols-2 sm:grid-cols-4 gap-4">
+        <TrustBadge title="۱۰۰٪ اورجینال" text="اصالت هر محصول تضمین می‌شود" />
+        <TrustBadge title="پرداخت امن" text="درگاه بانکی رمزنگاری‌شده" />
+        <TrustBadge title="بسته‌بندی ویژه" text="ارسال ایمن با بسته‌بندی مراقبت‌شده" />
+        <TrustBadge title="پشتیبانی مستقیم" text="پاسخ‌گویی به سوالات پیش و پس از خرید" />
+      </Reveal>
     </main>
   );
 }
@@ -426,22 +423,6 @@ function TrustBadge({ title, text }) {
       <p className="text-gold font-display text-sm mb-1">{title}</p>
       <p className="text-ink-faint text-xs">{text}</p>
     </div>
-  );
-}
-
-function CascadePattern() {
-  // soft, repeating scallops — an "opal seashell cascade" rendered as a
-  // quiet background texture rather than a literal illustration
-  return (
-    <svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
-      <defs>
-        <pattern id="cascade" width="80" height="40" patternUnits="userSpaceOnUse">
-          <path d="M0 20 Q20 0 40 20 T80 20" fill="none" stroke="#C592A8" strokeWidth="1.2" />
-          <path d="M0 32 Q20 12 40 32 T80 32" fill="none" stroke="#3EBCB3" strokeWidth="1" />
-        </pattern>
-      </defs>
-      <rect width="100%" height="100%" fill="url(#cascade)" />
-    </svg>
   );
 }
 

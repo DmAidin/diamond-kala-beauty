@@ -67,12 +67,12 @@ export default function OrderDetailPage({ params }) {
           )}
           <div className="flex justify-between text-ink-muted">
             <span>روش تحویل</span>
-            <span>{order.deliveryMethod === "pickup" ? "تحویل حضوری" : "ارسال با پیک"}</span>
+            <span>{order.deliveryMethod === "pickup" ? "تحویل حضوری" : "ارسال با پیک (پس‌کرایه)"}</span>
           </div>
           <div className="flex justify-between text-ink-muted">
             <span>هزینه ارسال</span>
-            <span className="font-mono">
-              {order.shippingCost > 0 ? order.shippingCost.toLocaleString() : "رایگان"}
+            <span className="text-xs">
+              {order.deliveryMethod === "pickup" ? "رایگان" : "پس‌کرایه — پرداخت به پیک"}
             </span>
           </div>
           <div className="flex justify-between text-ink font-semibold">

@@ -13,7 +13,7 @@ const provinces = [
   "گلستان", "سمنان", "مرکزی", "ایلام", "کهگیلویه و بویراحمد", "خراسان شمالی", "خراسان جنوبی",
 ];
 
-const COURIER_FEE = 200000;
+const COURIER_FEE = 0; // collected by the courier in person, not paid online
 
 export default function CheckoutPage() {
   const cart = useSelector((state) => state.cart);
@@ -38,7 +38,7 @@ export default function CheckoutPage() {
   const [error, setError] = useState(null);
 
   const discount = coupon?.discount || 0;
-  const shippingCost = deliveryMethod === "courier" ? COURIER_FEE : 0;
+  const shippingCost = COURIER_FEE;
   const finalTotal = Math.max(cart.totalPrice - discount, 0) + shippingCost;
 
   const applyCoupon = async () => {
@@ -139,8 +139,10 @@ export default function CheckoutPage() {
                 deliveryMethod === "courier" ? "border-gold bg-gold/10" : "border-base-line hover:border-gold/50"
               }`}
             >
-              <p className="text-ink font-medium mb-1">ارسال با پیک</p>
-              <p className="text-ink-muted text-xs">تحویل درب منزل — {COURIER_FEE.toLocaleString()} تومان هزینه ارسال</p>
+              <p className="text-ink font-medium mb-1">ارسال با پیک (پس‌کرایه)</p>
+              <p className="text-ink-muted text-xs">
+                تحویل درب منزل — گیرنده مبلغ ارسال را پس از دریافت کالا پرداخت می‌کند
+              </p>
             </button>
             <button
               type="button"
@@ -269,8 +271,8 @@ export default function CheckoutPage() {
             )}
             <div className="spec-row text-sm">
               <span className="text-ink-muted">هزینه ارسال</span>
-              <span className="text-ink font-mono">
-                {shippingCost > 0 ? shippingCost.toLocaleString() : "رایگان (تحویل حضوری)"}
+              <span className="text-ink text-xs">
+                {deliveryMethod === "pickup" ? "رایگان (تحویل حضوری)" : "پس‌کرایه — پرداخت به پیک"}
               </span>
             </div>
             <div className="spec-row text-ink text-base font-semibold">

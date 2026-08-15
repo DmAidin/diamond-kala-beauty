@@ -63,10 +63,7 @@ export default function Navbar() {
       <div className="trace-line" />
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
         <div className="flex items-center gap-4 lg:gap-6 h-32 lg:h-44">
-          <Link href="/" className="flex items-center gap-3 shrink-0" aria-label="دایمند کالا">
-            <div className="relative w-20 h-20 sm:w-24 sm:h-24 shrink-0">
-              <Image src="/logo.png" alt="" fill sizes="96px" className="object-contain" />
-            </div>
+          <Link href="/" className="flex items-center shrink-0" aria-label="دایمند کالا">
             <div className="relative w-56 h-20 sm:w-72 sm:h-24 lg:w-80 lg:h-28 shrink-0">
               <Image src="/new-logo.png" alt="دایمند کالا" fill sizes="320px" className="object-contain" priority />
             </div>
