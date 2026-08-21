@@ -22,7 +22,7 @@ const mono = JetBrains_Mono({
 
 export const metadata = {
   title: {
-    default: "دایمند کالا | فروشگاه آنلاین لوازم آرایشی و بهداشتی",
+    default: "6857152",
     template: "%s | دایمند کالا",
   },
   description:
