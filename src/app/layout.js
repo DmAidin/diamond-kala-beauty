@@ -44,6 +44,7 @@ export default function RootLayout({ children }) {
   return (
     <html lang="fa" dir="rtl" className={`${display.variable} ${mono.variable}`} suppressHydrationWarning>
       <head>
+          <meta name="enamad" content="6857152" />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link
           href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;600;700;800&display=swap"
