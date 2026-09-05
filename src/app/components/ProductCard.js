@@ -46,11 +46,11 @@ export default function ProductCard({ product, wishlistIds }) {
 
   return (
     <>
-      <div className="group relative bg-base-panel rounded-3xl border border-base-line p-4 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between">
+      <div className="group relative bg-base-panel rounded-sm border border-base-line p-4 hover:border-gold/50 transition-colors duration-200 flex flex-col justify-between">
         <button
           onClick={toggleWishlist}
           aria-label="افزودن به علاقه‌مندی‌ها"
-          className={`absolute top-6 left-6 z-10 w-9 h-9 rounded-full bg-base-panel/90 backdrop-blur-md shadow-md flex items-center justify-center transition-transform hover:scale-110 ${
+          className={`absolute top-6 left-6 z-10 w-9 h-9 rounded-full bg-base-panel border border-base-line flex items-center justify-center transition-colors hover:border-gold/50 ${
             !session ? "hidden" : ""
           }`}
         >
@@ -60,13 +60,13 @@ export default function ProductCard({ product, wishlistIds }) {
         </button>
 
         {lowStock && (
-          <span className="absolute top-6 right-6 z-10 bg-ink text-base text-[10px] font-bold px-2.5 py-1 rounded-full shadow-md">
+          <span className="pill absolute top-6 right-6 z-10 bg-base-panel text-[10px]">
             فقط {stock} عدد
           </span>
         )}
 
         <Link href={`/product/${id}`} className="block">
-          <div className="relative aspect-square rounded-2xl overflow-hidden bg-white mb-4">
+          <div className="relative aspect-square rounded-sm overflow-hidden bg-base-raised mb-4 border border-base-line">
             {image && (
               <Image
                 src={image}
@@ -81,9 +81,13 @@ export default function ProductCard({ product, wishlistIds }) {
                 e.preventDefault();
                 setQuickView(true);
               }}
-              className="absolute inset-x-3 bottom-3 py-2 bg-base-panel/90 backdrop-blur-md text-ink text-xs font-bold rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 shadow-md text-center"
+              className="absolute inset-x-3 bottom-3 py-2 bg-base-panel/95 text-ink text-xs font-bold rounded-sm border border-base-line opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center gap-1.5"
             >
-              👁️ مشاهده سریع
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
+                <path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z" />
+                <circle cx="12" cy="12" r="3" />
+              </svg>
+              مشاهده سریع
             </button>
           </div>
 
@@ -100,7 +104,7 @@ export default function ProductCard({ product, wishlistIds }) {
           <button
             onClick={handleAdd}
             disabled={!inStock}
-            className="px-3.5 py-2 bg-gold hover:bg-gold-soft text-base rounded-xl shadow-md hover:shadow-lg transition-all text-xs font-bold disabled:opacity-40 disabled:cursor-not-allowed"
+            className="px-3.5 py-2 bg-gold hover:bg-gold-dim text-base rounded-sm transition-colors text-xs font-bold disabled:opacity-40 disabled:cursor-not-allowed"
           >
             {inStock ? "+ خرید" : "ناموجود"}
           </button>

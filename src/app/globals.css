@@ -101,30 +101,32 @@ body {
 }
 .fade-up { animation: fade-up 0.5s ease-out both; }
 
-/* signature: soft scalloped card — generous radius + gentle shadow,
-   replacing the tech theme's cut-diamond corners with a rounded,
-   seashell-like silhouette suited to a beauty storefront */
+/* signature: soft scalloped card — generous radius, minimal by default.
+   A thin neutral border carries the shape; the hover lift is small and
+   the glow is barely-there so cards read calm instead of glossy. */
 .pastel-card {
   border-radius: 1.5rem;
-  transition: transform 0.35s ease, box-shadow 0.35s ease;
+  border: 1px solid rgb(var(--color-base-line));
+  transition: transform 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
 }
 .pastel-card:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 18px 34px -18px rgb(var(--color-gold) / 0.45);
+  transform: translateY(-2px);
+  border-color: rgb(var(--color-gold) / 0.4);
+  box-shadow: 0 8px 20px -14px rgb(var(--color-ink) / 0.25);
 }
 
-/* signature: opal shimmer — a slow-moving pastel gradient sheen that
-   crosses product art on hover, evoking color-shifting nacre/opal */
+/* signature: opal shimmer — kept for spots that still want it, but tuned
+   down to a faint pass rather than a bright pastel sheen, so it reads as
+   a subtle hint of motion instead of a decorative glow. */
 .opal-shimmer { position: relative; overflow: hidden; }
 .opal-shimmer::after {
   content: "";
   position: absolute;
   inset: 0;
   background: linear-gradient(115deg,
-    transparent 35%,
-    rgb(var(--color-gold-soft) / 0.55) 48%,
-    rgb(var(--color-teal) / 0.45) 55%,
-    transparent 68%
+    transparent 42%,
+    rgb(var(--color-base-panel) / 0.5) 50%,
+    transparent 58%
   );
   transform: translateX(-130%);
   transition: transform 0.8s ease;
@@ -175,3 +177,80 @@ input[type="checkbox"] {
    variant used sharp rounded-sm everywhere; this store reads gentler with
    one global override instead of touching every component. */
 .rounded-sm { border-radius: 0.85rem; }
+
+/* ---------------------------------------------------------------------
+   Minimal design pass — small, reusable primitives so every page that
+   adopts them stays visually consistent from one shared definition.
+   --------------------------------------------------------------------- */
+
+/* small outlined tag — badges, footer info tags, hero eyebrow label */
+.pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  border: 1px solid rgb(var(--color-base-line));
+  border-radius: 999px;
+  padding: 0.4rem 0.9rem;
+  font-size: 0.8rem;
+  color: rgb(var(--color-ink-muted));
+  background: rgb(var(--color-base-panel));
+  transition: border-color 0.2s ease, color 0.2s ease;
+}
+.pill:hover { border-color: rgb(var(--color-gold) / 0.5); color: rgb(var(--color-ink)); }
+.pill-accent {
+  border-color: rgb(var(--color-gold) / 0.4);
+  color: rgb(var(--color-gold-dim));
+  background: rgb(var(--color-gold) / 0.08);
+}
+
+/* thin colored strip used for section titles instead of heavy display
+   headings — "جدیدترین محصولات" style banner */
+.section-banner {
+  display: flex;
+  align-items: center;
+  padding: 0.75rem 1.1rem;
+  border-radius: 0.6rem;
+  background: rgb(var(--color-gold) / 0.1);
+  color: rgb(var(--color-ink));
+  font-weight: 600;
+}
+
+/* square category card — photo fills the frame, name sits on a soft
+   dark scrim at the bottom, thin neutral border instead of a shadow */
+.category-photo-card {
+  position: relative;
+  aspect-ratio: 1 / 1;
+  overflow: hidden;
+  border-radius: 0.85rem;
+  border: 1px solid rgb(var(--color-base-line));
+  background: rgb(var(--color-base-raised));
+}
+.category-photo-card img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.4s ease;
+}
+.category-photo-card:hover img { transform: scale(1.04); }
+.category-photo-card::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(0deg, rgb(0 0 0 / 0.55) 0%, transparent 55%);
+}
+.category-photo-card span.cat-label {
+  position: absolute;
+  bottom: 0.75rem;
+  right: 0.9rem;
+  z-index: 1;
+  color: #fff;
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+
+/* minimal FAQ row — a hairline instead of a boxed card */
+.faq-row {
+  border-top: 1px solid rgb(var(--color-base-line));
+  padding: 1rem 0;
+}
+.faq-row:last-child { border-bottom: 1px solid rgb(var(--color-base-line)); }

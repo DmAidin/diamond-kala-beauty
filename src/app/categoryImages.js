@@ -4,9 +4,9 @@
 // of inside a white box. Any category not listed here still works — it
 // just falls back to a plain initial-letter badge instead of a photo.
 export const CATEGORY_IMAGES = {
-  "مراقبت پوست": { src: "/category-skincare.png", width: 283, height: 321 },
+  "مراقبت پوست": { src: "/category-skincare.jpg", width: 283, height: 321 },
   "بهداشت شخصی": { src: "/category-hygiene.png", width: 281, height: 321 },
-  "عطر و ادکلن": { src: "/category-perfume.png", width: 288, height: 323 },
-  "آرایش": { src: "/category-makeup.png", width: 282, height: 323 },
-  "مراقبت مو": { src: "/category-haircare.png", width: 281, height: 321 },
+  "عطر و ادکلن": { src: "/category-perfume.jpg", width: 288, height: 323 },
+  "آرایش": { src: "/category-makeup.jpg", width: 282, height: 323 },
+  "مراقبت مو": { src: "/category-haircare.jpg", width: 281, height: 321 },
 };

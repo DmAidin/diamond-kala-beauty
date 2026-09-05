@@ -35,7 +35,7 @@ export default function ContactPage() {
       <div className="grid grid-cols-1 lg:grid-cols-5 gap-8">
         <div className="lg:col-span-2 space-y-5">
           <InfoRow label="تلفن" value="09369555097" href="tel:09369555097" />
-          <InfoRow label="ایمیل" value="Rahkarhayehooshmandelin@gmail.com" href="mailto:Rahkarhayehooshmandelin@gmail.com" />
+          <InfoRow label="ایمیل" value="info@diamondkalashop.ir" href="mailto:info@diamondkalashop.ir" />
           <InfoRow label="شهر" value="تهران" />
         </div>
 

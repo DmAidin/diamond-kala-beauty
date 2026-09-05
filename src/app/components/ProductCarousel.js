@@ -12,8 +12,8 @@ export default function ProductCarousel({ title, products, loading, seeAllHref, 
 
   return (
     <section className="max-w-7xl mx-auto px-4 sm:px-6 py-8">
-      <div className="flex items-center justify-between mb-5">
-        <h2 className="font-display text-2xl text-ink">{title}</h2>
+      <div className="flex items-center justify-between gap-4 mb-5">
+        <div className="section-banner flex-1">{title}</div>
         {seeAllHref && (
           <Link href={seeAllHref} className="text-sm text-gold hover:underline shrink-0">
             مشاهده همه
