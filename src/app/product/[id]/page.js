@@ -40,6 +40,7 @@ export async function generateMetadata({ params }) {
   const image = product.images?.[0] || product.image;
   const title = `${product.name} | دایمند کالا`;
   const description = product.description?.slice(0, 160) || `خرید ${product.name} از فروشگاه دایمند کالا`;
+  const inStock = (product.stock ?? 0) > 0;
 
   return {
     title,
@@ -49,6 +50,15 @@ export async function generateMetadata({ params }) {
       description,
       images: image ? [image] : [],
       type: "website",
+    },
+    // Required by price-comparison crawlers (e.g. Torob) that read only the
+    // no-JS HTML and look for these exact tag names — separate from, and in
+    // addition to, the standard SEO tags above.
+    other: {
+      product_id: product._id,
+      product_name: product.name,
+      product_price: String(product.price),
+      availability: inStock ? "instock" : "outofstock",
     },
   };
 }
