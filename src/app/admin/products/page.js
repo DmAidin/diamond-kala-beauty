@@ -222,13 +222,24 @@ export default function AdminProductsPage() {
           {migrating ? "در حال انتقال..." : "انتقال تصاویر قدیمی"}
         </button>
         {migrateResult && (
-          <p className={`mt-2 text-sm ${migrateResult.error ? "text-signal-bad" : "text-signal-ok"}`}>
-            {migrateResult.error
-              ? migrateResult.error
-              : `${migrateResult.migratedProducts} محصول، ${migrateResult.migratedImages} تصویر منتقل شد.${
-                  migrateResult.failures?.length ? ` (${migrateResult.failures.length} مورد ناموفق)` : ""
-                }`}
-          </p>
+          <div className={`mt-2 text-sm ${migrateResult.error ? "text-signal-bad" : "text-signal-ok"}`}>
+            <p>
+              {migrateResult.error
+                ? migrateResult.error
+                : `${migrateResult.migratedProducts} محصول، ${migrateResult.migratedImages} تصویر منتقل شد.${
+                    migrateResult.failures?.length ? ` (${migrateResult.failures.length} مورد ناموفق)` : ""
+                  }`}
+            </p>
+            {migrateResult.failures?.length > 0 && (
+              <ul className="mt-2 space-y-1 text-signal-bad text-xs list-disc pr-4">
+                {migrateResult.failures.map((f, i) => (
+                  <li key={i}>
+                    محصول {f.productId}: {f.error}
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
         )}
       </div>
 
