@@ -1,15 +1,16 @@
 import { connectToDB } from "../../../../utils/database";
 import Product from "../../../../models/product";
+import { serializeProduct } from "../../../../utils/serialize";
 
 export async function GET(req, { params }) {
   const { id } = params;
   try {
     await connectToDB();
-    const product = await Product.findById(id);
+    const product = await Product.findById(id).lean();
     if (!product) {
       return new Response(JSON.stringify({ error: "محصول یافت نشد" }), { status: 404 });
     }
-    return new Response(JSON.stringify(product), {
+    return new Response(JSON.stringify(serializeProduct(product)), {
       status: 200,
       headers: { "Content-Type": "application/json" },
     });

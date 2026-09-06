@@ -1,5 +1,8 @@
 import { connectToDB } from "../../../utils/database";
 import Product from "../../../models/product";
+import NotifyRequest from "../../../models/notifyRequest";
+import { sendEmail } from "../../../utils/email";
+import { serializeProduct } from "../../../utils/serialize";
 
 // GET: دریافت همه محصولات (با فیلتر اختیاری category)
 export async function GET(request) {
@@ -11,8 +14,12 @@ export async function GET(request) {
     const query = {};
     if (category) query.category = category;
     if (q) query.name = { $regex: q, $options: "i" };
-    const products = await Product.find(query).sort({ createdAt: -1 });
-    return new Response(JSON.stringify(products), {
+    // .lean() + serializeProduct so the `specs` Map comes back as a plain
+    // object — a Map silently serializes to "{}" through a bare
+    // JSON.stringify(mongooseDocument), which would make previously-saved
+    // specs disappear the moment an admin reopens a product to edit it
+    const products = await Product.find(query).sort({ createdAt: -1 }).lean();
+    return new Response(JSON.stringify(products.map(serializeProduct)), {
       status: 200,
       headers: { "Content-Type": "application/json" },
     });
@@ -58,6 +65,35 @@ export async function POST(request) {
   }
 }
 
+// When a product goes from "out of stock" to "back in stock", email
+// everyone who asked to be notified, then mark those requests as done so
+// nobody gets emailed twice for the same restock.
+async function notifyWaitingCustomers(product) {
+  const waiting = await NotifyRequest.find({ productId: product._id, notifiedAt: null });
+  if (waiting.length === 0) return;
+
+  const image = product.images?.[0] || product.image;
+  for (const req of waiting) {
+    await sendEmail({
+      to: req.email,
+      subject: `«${product.name}» دوباره موجود شد | دایمند کالا`,
+      html: `
+        <div dir="rtl" style="font-family: Tahoma, sans-serif; text-align: right;">
+          ${image ? `<img src="${image}" alt="${product.name}" style="max-width:200px;" />` : ""}
+          <p>محصولی که منتظرش بودید، دوباره موجود شد:</p>
+          <p style="font-weight:bold;">${product.name}</p>
+          <p>برای مشاهده و خرید به فروشگاه دایمند کالا مراجعه کنید.</p>
+        </div>
+      `,
+    });
+  }
+
+  await NotifyRequest.updateMany(
+    { _id: { $in: waiting.map((r) => r._id) } },
+    { $set: { notifiedAt: new Date() } }
+  );
+}
+
 // PUT: ویرایش محصول بر اساس id (از query parameter دریافت می‌شود)
 export async function PUT(request) {
   try {
@@ -82,6 +118,7 @@ export async function PUT(request) {
       });
     }
 
+    const previous = await Product.findById(id, "stock");
     const updatedProduct = await Product.findByIdAndUpdate(id, body, { new: true });
 
     if (!updatedProduct) {
@@ -89,6 +126,15 @@ export async function PUT(request) {
         status: 404,
         headers: { "Content-Type": "application/json" },
       });
+    }
+
+    if (previous && previous.stock <= 0 && updatedProduct.stock > 0) {
+      try {
+        await notifyWaitingCustomers(updatedProduct);
+      } catch (notifyError) {
+        // a failed notification email should never fail the product save itself
+        console.error("restock notification error:", notifyError);
+      }
     }
 
     return new Response(JSON.stringify(updatedProduct), {

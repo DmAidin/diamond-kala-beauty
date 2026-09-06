@@ -22,12 +22,21 @@ export async function GET(request) {
     }
 
     if (status !== "OK") {
-      order.status = "failed";
-      await order.save();
+      if (order.status === "pending") {
+        order.status = "failed";
+        await order.save();
+        // release the stock that was reserved when the order was created —
+        // the customer never completed payment, so it shouldn't stay locked
+        await Promise.all(
+          order.items.map((item) =>
+            Product.updateOne({ _id: item.productId }, { $inc: { stock: item.quantity } })
+          )
+        );
+      }
       return NextResponse.redirect(`${baseUrl}/payment/result?status=failed&orderId=${order._id}`);
     }
 
-    // never re-verify (and never re-deduct stock for) an order already marked paid
+    // never re-verify (and never re-release/re-deduct stock for) an order already resolved
     if (order.status === "paid") {
       return NextResponse.redirect(
         `${baseUrl}/payment/result?status=paid&orderId=${order._id}&orderNumber=${order.orderNumber}&refId=${order.payment.refId}`
@@ -40,24 +49,24 @@ export async function GET(request) {
       order.status = "paid";
       order.payment.refId = String(result.refId);
       await order.save();
-
-      // deduct stock now that payment is actually confirmed — not at order
-      // creation, so abandoned/unpaid orders never lock up inventory
-      await Promise.all(
-        order.items.map((item) =>
-          Product.updateOne({ _id: item.productId }, { $inc: { stock: -item.quantity } })
-        )
-      );
-      // safety net: never let a race condition push stock negative
-      await Product.updateMany({ stock: { $lt: 0 } }, { $set: { stock: 0 } });
+      // stock was already reserved atomically when the order was created —
+      // nothing to deduct here, which is what avoids the double-deduction
+      // (and the overselling gap) a second decrement at this step would reopen
 
       return NextResponse.redirect(
         `${baseUrl}/payment/result?status=paid&orderId=${order._id}&orderNumber=${order.orderNumber}&refId=${result.refId}`
       );
     }
 
-    order.status = "failed";
-    await order.save();
+    if (order.status === "pending") {
+      order.status = "failed";
+      await order.save();
+      await Promise.all(
+        order.items.map((item) =>
+          Product.updateOne({ _id: item.productId }, { $inc: { stock: item.quantity } })
+        )
+      );
+    }
     return NextResponse.redirect(`${baseUrl}/payment/result?status=failed&orderId=${order._id}`);
   } catch (error) {
     console.error("GET /api/payment/verify error:", error);

@@ -2,11 +2,12 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 
-const emptyForm = { name: "", price: "", images: [], category: "", brand: "", stock: "", description: "" };
+const emptyForm = { name: "", price: "", images: [], category: "", brand: "", stock: "", description: "", specs: [] };
 
 export default function AdminProductsPage() {
   const [products, setProducts] = useState([]);
   const [existingCategories, setExistingCategories] = useState([]);
+  const [waitingCounts, setWaitingCounts] = useState({});
   const [loading, setLoading] = useState(true);
   const [form, setForm] = useState(emptyForm);
   const [error, setError] = useState(null);
@@ -16,6 +17,16 @@ export default function AdminProductsPage() {
   useEffect(() => {
     fetchProducts();
     fetch("/api/categories").then((res) => res.json()).then((data) => setExistingCategories(data.categories || []));
+    // how many people are waiting on a "notify me" request per product —
+    // shown next to out-of-stock items so demand isn't invisible
+    fetch("/api/notify-me")
+      .then((res) => res.json())
+      .then((data) => {
+        if (Array.isArray(data)) {
+          setWaitingCounts(Object.fromEntries(data.map((d) => [d._id, d.count])));
+        }
+      })
+      .catch(() => {});
   }, []);
 
   async function fetchProducts() {
@@ -49,6 +60,25 @@ export default function AdminProductsPage() {
     setForm((f) => ({ ...f, images: f.images.filter((_, i) => i !== idx) }));
   };
 
+  // "specs" are the row-by-row table shown on the product page (e.g. "حجم"
+  // → "۱۰۰ میلی‌لیتر") — kept as an array of {key, value} here so each row
+  // has a stable identity to edit, then collapsed into a plain object right
+  // before it's sent to the API.
+  const addSpecRow = () => {
+    setForm((f) => ({ ...f, specs: [...f.specs, { key: "", value: "" }] }));
+  };
+
+  const updateSpecRow = (idx, field, val) => {
+    setForm((f) => ({
+      ...f,
+      specs: f.specs.map((row, i) => (i === idx ? { ...row, [field]: val } : row)),
+    }));
+  };
+
+  const removeSpecRow = (idx) => {
+    setForm((f) => ({ ...f, specs: f.specs.filter((_, i) => i !== idx) }));
+  };
+
   const handleDelete = async (id) => {
     if (!confirm("آیا از حذف این محصول مطمئن هستید؟")) return;
     try {
@@ -80,6 +110,9 @@ export default function AdminProductsPage() {
       brand: form.brand,
       stock: Number(form.stock) || 0,
       description: form.description,
+      specs: Object.fromEntries(
+        form.specs.filter((row) => row.key.trim() && row.value.trim()).map((row) => [row.key.trim(), row.value.trim()])
+      ),
     };
 
     try {
@@ -121,6 +154,7 @@ export default function AdminProductsPage() {
       brand: product.brand || "",
       stock: product.stock ?? "",
       description: product.description || "",
+      specs: Object.entries(product.specs || {}).map(([key, value]) => ({ key, value })),
     });
     setError(null);
   };
@@ -207,6 +241,49 @@ export default function AdminProductsPage() {
           />
         </div>
 
+        <div className="sm:col-span-2">
+          <label className="block mb-2 text-sm text-ink-muted">
+            مشخصات فنی (جدول — یک طرف عنوان، طرف دیگر مقدار)
+          </label>
+          <div className="space-y-2">
+            {form.specs.map((row, idx) => (
+              <div key={idx} className="flex gap-2">
+                <input
+                  value={row.key}
+                  onChange={(e) => updateSpecRow(idx, "key", e.target.value)}
+                  placeholder="مثلاً: حجم"
+                  disabled={saving}
+                  className="w-1/3 px-3 py-2 rounded-sm bg-base border border-base-line text-ink text-sm focus:outline-none focus:border-gold"
+                />
+                <input
+                  value={row.value}
+                  onChange={(e) => updateSpecRow(idx, "value", e.target.value)}
+                  placeholder="مثلاً: ۱۰۰ میلی‌لیتر"
+                  disabled={saving}
+                  className="flex-1 px-3 py-2 rounded-sm bg-base border border-base-line text-ink text-sm focus:outline-none focus:border-gold"
+                />
+                <button
+                  type="button"
+                  onClick={() => removeSpecRow(idx)}
+                  disabled={saving}
+                  className="w-9 h-9 shrink-0 rounded-sm border border-base-line text-signal-bad hover:border-signal-bad transition-colors"
+                  aria-label="حذف این ردیف"
+                >
+                  ✕
+                </button>
+              </div>
+            ))}
+          </div>
+          <button
+            type="button"
+            onClick={addSpecRow}
+            disabled={saving}
+            className="mt-2 text-sm text-gold hover:underline"
+          >
+            + افزودن ردیف مشخصات
+          </button>
+        </div>
+
         <div className="sm:col-span-2 flex items-center gap-4">
           <button type="submit" disabled={saving} className="px-6 py-3 rounded-sm bg-gold text-base font-semibold disabled:opacity-50">
             {saving ? "در حال ذخیره..." : editingId ? "ذخیره تغییرات" : "افزودن محصول"}
@@ -243,7 +320,14 @@ export default function AdminProductsPage() {
                   <td className="py-3 px-4 text-ink">{product.name}</td>
                   <td className="py-3 px-4 text-ink-muted">{product.category || "—"}</td>
                   <td className="py-3 px-4 font-mono text-gold">{product.price.toLocaleString()}</td>
-                  <td className="py-3 px-4 text-ink-muted">{product.stock ?? 0}</td>
+                  <td className="py-3 px-4 text-ink-muted">
+                    {product.stock ?? 0}
+                    {(product.stock ?? 0) <= 0 && waitingCounts[product._id] > 0 && (
+                      <span className="mr-2 text-[10px] px-2 py-0.5 rounded-full border border-gold/50 text-gold">
+                        {waitingCounts[product._id]} نفر منتظرن
+                      </span>
+                    )}
+                  </td>
                   <td className="py-3 px-4 space-x-3">
                     <button onClick={() => startEdit(product)} className="text-gold hover:underline ml-3">ویرایش</button>
                     <button onClick={() => handleDelete(product._id)} className="text-signal-bad hover:underline">حذف</button>

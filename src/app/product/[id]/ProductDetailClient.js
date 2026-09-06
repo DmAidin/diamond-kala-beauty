@@ -218,6 +218,8 @@ export default function ProductDetailClient({ product, related, initialReviews, 
             افزودن به سبد خرید
           </button>
 
+          {!inStock && <NotifyMeForm productId={id} sessionEmail={session?.user?.email} />}
+
           {specs.length > 0 && (
             <div className="mt-10">
               <h2 className="font-display text-lg text-ink mb-3">مشخصات فنی</h2>
@@ -299,6 +301,61 @@ export default function ProductDetailClient({ product, related, initialReviews, 
 
       <RecentlyViewed excludeId={id} />
     </main>
+  );
+}
+
+function NotifyMeForm({ productId, sessionEmail }) {
+  const [email, setEmail] = useState(sessionEmail || "");
+  const [status, setStatus] = useState("idle"); // idle | sending | done | error
+  const [error, setError] = useState("");
+
+  const submit = async (e) => {
+    e.preventDefault();
+    setStatus("sending");
+    setError("");
+    try {
+      const res = await fetch("/api/notify-me", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ productId, email }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "خطا در ثبت درخواست");
+      setStatus("done");
+    } catch (err) {
+      setError(err.message);
+      setStatus("error");
+    }
+  };
+
+  if (status === "done") {
+    return (
+      <p className="mt-4 text-sm text-signal-ok">
+        ثبت شد — به‌محض موجود شدن این کالا، به {email} خبر می‌دهیم.
+      </p>
+    );
+  }
+
+  return (
+    <form onSubmit={submit} className="mt-4 flex flex-col sm:flex-row gap-2 max-w-md">
+      <input
+        type="email"
+        required
+        value={email}
+        onChange={(e) => setEmail(e.target.value)}
+        placeholder="ایمیل شما"
+        dir="ltr"
+        className="flex-1 bg-base border border-base-line rounded-sm px-4 py-2 text-sm text-ink focus:outline-none focus:border-gold"
+      />
+      <button
+        type="submit"
+        disabled={status === "sending"}
+        className="px-5 py-2 rounded-sm border border-gold text-gold text-sm font-semibold hover:bg-gold hover:text-base transition-colors disabled:opacity-50 whitespace-nowrap"
+      >
+        {status === "sending" ? "..." : "اطلاع بده وقتی موجود شد"}
+      </button>
+      {error && <p className="text-signal-bad text-xs">{error}</p>}
+    </form>
   );
 }
 

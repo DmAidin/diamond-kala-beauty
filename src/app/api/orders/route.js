@@ -78,62 +78,86 @@ export async function POST(request) {
 
     await connectToDB();
 
-    // confirm every item is still in stock before creating the order
-    const products = await Product.find({ _id: { $in: items.map((i) => i.id) } });
+    // Atomically RESERVE stock for every item — this is a real deduction at
+    // order-creation time, not just a read-then-check. A plain read-then-check
+    // lets two customers both "pass" the check for the same last unit before
+    // either one's order finishes, overselling it. findOneAndUpdate with a
+    // `stock: { $gte: quantity }` filter is atomic at the database level, so
+    // only one of two simultaneous requests can ever win the last unit.
+    // If any item in the cart fails to reserve, every item already reserved
+    // in this same request is rolled back before returning the error.
+    const reserved = [];
     for (const item of items) {
-      const product = products.find((p) => String(p._id) === item.id);
-      if (!product || product.stock < item.quantity) {
+      const updated = await Product.findOneAndUpdate(
+        { _id: item.id, stock: { $gte: item.quantity } },
+        { $inc: { stock: -item.quantity } },
+        { new: true }
+      );
+      if (!updated) {
+        await Promise.all(
+          reserved.map((r) => Product.updateOne({ _id: r.id }, { $inc: { stock: r.quantity } }))
+        );
         return new Response(
           JSON.stringify({ error: `موجودی «${item.title}» کافی نیست` }),
           { status: 400 }
         );
       }
+      reserved.push(item);
     }
 
-    const subtotal = items.reduce((sum, i) => sum + i.price * i.quantity, 0);
-    const shippingCost = method === "courier" ? COURIER_FEE : 0;
-    let discount = 0;
-    let appliedCode = "";
+    // stock is now reserved — if anything below fails, release it before
+    // returning an error, so a coupon/DB hiccup never leaves inventory stuck
+    try {
+      const subtotal = items.reduce((sum, i) => sum + i.price * i.quantity, 0);
+      const shippingCost = method === "courier" ? COURIER_FEE : 0;
+      let discount = 0;
+      let appliedCode = "";
 
-    if (couponCode?.trim()) {
-      const coupon = await Coupon.findOne({ code: couponCode.trim().toUpperCase() });
-      const valid =
-        coupon &&
-        coupon.active &&
-        (!coupon.expiresAt || new Date(coupon.expiresAt) >= new Date()) &&
-        subtotal >= coupon.minOrderTotal;
-      if (valid) {
-        discount = coupon.type === "percent" ? Math.round((subtotal * coupon.value) / 100) : coupon.value;
-        appliedCode = coupon.code;
+      if (couponCode?.trim()) {
+        const coupon = await Coupon.findOne({ code: couponCode.trim().toUpperCase() });
+        const valid =
+          coupon &&
+          coupon.active &&
+          (!coupon.expiresAt || new Date(coupon.expiresAt) >= new Date()) &&
+          subtotal >= coupon.minOrderTotal;
+        if (valid) {
+          discount = coupon.type === "percent" ? Math.round((subtotal * coupon.value) / 100) : coupon.value;
+          appliedCode = coupon.code;
+        }
       }
+
+      const totalPrice = Math.max(subtotal - discount, 0) + shippingCost;
+      const orderNumber = await nextOrderNumber();
+
+      const order = await Order.create({
+        userId: session.user.id,
+        orderNumber,
+        items: items.map((i) => ({
+          productId: i.id,
+          title: i.title,
+          price: i.price,
+          quantity: i.quantity,
+        })),
+        subtotal,
+        discount,
+        deliveryMethod: method,
+        shippingCost,
+        totalPrice,
+        couponCode: appliedCode,
+        receiver,
+        status: "pending",
+      });
+
+      return new Response(JSON.stringify(order), {
+        status: 201,
+        headers: { "Content-Type": "application/json" },
+      });
+    } catch (innerError) {
+      await Promise.all(
+        reserved.map((r) => Product.updateOne({ _id: r.id }, { $inc: { stock: r.quantity } }))
+      );
+      throw innerError;
     }
-
-    const totalPrice = Math.max(subtotal - discount, 0) + shippingCost;
-    const orderNumber = await nextOrderNumber();
-
-    const order = await Order.create({
-      userId: session.user.id,
-      orderNumber,
-      items: items.map((i) => ({
-        productId: i.id,
-        title: i.title,
-        price: i.price,
-        quantity: i.quantity,
-      })),
-      subtotal,
-      discount,
-      deliveryMethod: method,
-      shippingCost,
-      totalPrice,
-      couponCode: appliedCode,
-      receiver,
-      status: "pending",
-    });
-
-    return new Response(JSON.stringify(order), {
-      status: 201,
-      headers: { "Content-Type": "application/json" },
-    });
   } catch (error) {
     console.error("POST /api/orders error:", error);
     return new Response(JSON.stringify({ error: "خطا در ثبت سفارش" }), { status: 500 });
