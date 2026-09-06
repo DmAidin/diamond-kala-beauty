@@ -13,6 +13,9 @@ export default function AdminProductsPage() {
   const [error, setError] = useState(null);
   const [saving, setSaving] = useState(false);
   const [editingId, setEditingId] = useState(null);
+  const [uploadingCount, setUploadingCount] = useState(0);
+  const [migrating, setMigrating] = useState(false);
+  const [migrateResult, setMigrateResult] = useState(null);
 
   useEffect(() => {
     fetchProducts();
@@ -43,21 +46,55 @@ export default function AdminProductsPage() {
     }
   }
 
-  // handles selecting any number of images at once — each file is read and
-  // appended to the gallery, existing images are kept
-  const handleImagesChange = (e) => {
+  // handles selecting any number of images at once — each file is uploaded
+  // to Vercel Blob and the real hosted URL it returns is appended to the
+  // gallery. (Previously this converted files to base64 data URIs and
+  // stored those directly — Google's structured data validator rejects a
+  // data URI as an "Invalid URL", and it also bloated every page's HTML.)
+  const handleImagesChange = async (e) => {
     const files = Array.from(e.target.files || []);
     if (files.length === 0) return;
-    files.forEach((file) => {
-      const reader = new FileReader();
-      reader.onloadend = () => setForm((f) => ({ ...f, images: [...f.images, reader.result] }));
-      reader.readAsDataURL(file);
-    });
     e.target.value = ""; // allow re-selecting the same file again later
+
+    setUploadingCount(files.length);
+    setError(null);
+    try {
+      for (const file of files) {
+        const body = new FormData();
+        body.append("file", file);
+        const res = await fetch("/api/upload", { method: "POST", body });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || "خطا در آپلود تصویر");
+        setForm((f) => ({ ...f, images: [...f.images, data.url] }));
+      }
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setUploadingCount(0);
+    }
   };
 
   const removeImage = (idx) => {
     setForm((f) => ({ ...f, images: f.images.filter((_, i) => i !== idx) }));
+  };
+
+  // one-time cleanup for images saved before the upload form used real
+  // Blob storage — safe to click more than once, already-migrated
+  // products are skipped automatically
+  const handleMigrateImages = async () => {
+    setMigrating(true);
+    setMigrateResult(null);
+    try {
+      const res = await fetch("/api/admin/migrate-images", { method: "POST" });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "خطا در انتقال تصاویر");
+      setMigrateResult(data);
+      fetchProducts();
+    } catch (err) {
+      setMigrateResult({ error: err.message });
+    } finally {
+      setMigrating(false);
+    }
   };
 
   // "specs" are the row-by-row table shown on the product page (e.g. "حجم"
@@ -167,9 +204,32 @@ export default function AdminProductsPage() {
 
   return (
     <main className="max-w-6xl mx-auto px-4 sm:px-6 py-12">
-      <div className="flex items-center justify-between mb-8">
+      <div className="flex items-center justify-between mb-4">
         <h1 className="font-display text-2xl text-ink">مدیریت محصولات</h1>
         <Link href="/admin" className="text-sm text-ink-muted hover:text-gold">بازگشت به پنل مدیریت</Link>
+      </div>
+
+      <div className="mb-8 p-4 bg-base-panel border border-base-line rounded-sm">
+        <p className="text-sm text-ink-muted mb-2">
+          تصاویری که قبل از فعال‌شدن آپلود واقعی ذخیره شده‌اند را به Vercel Blob منتقل کنید (فقط یک‌بار لازم است، اجرای دوباره‌ی آن هم مشکلی ندارد).
+        </p>
+        <button
+          type="button"
+          onClick={handleMigrateImages}
+          disabled={migrating}
+          className="px-4 py-2 rounded-sm border border-gold text-gold text-sm hover:bg-gold hover:text-base transition-colors disabled:opacity-50"
+        >
+          {migrating ? "در حال انتقال..." : "انتقال تصاویر قدیمی"}
+        </button>
+        {migrateResult && (
+          <p className={`mt-2 text-sm ${migrateResult.error ? "text-signal-bad" : "text-signal-ok"}`}>
+            {migrateResult.error
+              ? migrateResult.error
+              : `${migrateResult.migratedProducts} محصول، ${migrateResult.migratedImages} تصویر منتقل شد.${
+                  migrateResult.failures?.length ? ` (${migrateResult.failures.length} مورد ناموفق)` : ""
+                }`}
+          </p>
+        )}
       </div>
 
       <form onSubmit={handleSubmit} className="mb-10 p-6 bg-base-panel border border-base-line rounded-sm grid grid-cols-1 sm:grid-cols-2 gap-5">
@@ -205,9 +265,12 @@ export default function AdminProductsPage() {
             accept="image/*"
             multiple
             onChange={handleImagesChange}
-            disabled={saving}
+            disabled={saving || uploadingCount > 0}
             className="block w-full text-sm text-ink-muted file:ml-3 file:py-2 file:px-4 file:rounded-sm file:border-0 file:bg-gold/20 file:text-gold"
           />
+          {uploadingCount > 0 && (
+            <p className="text-xs text-gold mt-2">در حال آپلود {uploadingCount} تصویر...</p>
+          )}
           {form.images.length > 0 && (
             <div className="flex flex-wrap gap-3 mt-3">
               {form.images.map((src, idx) => (
