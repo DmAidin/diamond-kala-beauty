@@ -4,6 +4,14 @@ import Order from "@/models/order";
 import { serializeProduct } from "@/utils/serialize";
 import HomeClient from "./HomeClient";
 
+// tells Google this exact path ("/") is the one real URL for the store
+// front — regardless of any ?category=/?q= query string a visitor (or an
+// old link) lands on it with. Fixes "Duplicate without user-selected
+// canonical".
+export const metadata = {
+  alternates: { canonical: "/" },
+};
+
 // Server Component: fetches everything the storefront needs *before* the
 // page reaches the browser, so the initial HTML Googlebot sees already
 // contains every product card and its link — the client component below

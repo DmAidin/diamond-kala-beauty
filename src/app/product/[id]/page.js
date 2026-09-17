@@ -39,13 +39,20 @@ export async function generateMetadata({ params }) {
   const { product } = data;
   const image = product.images?.[0] || product.image;
   const validImage = image?.startsWith("http") ? image : undefined;
-  const title = `${product.name} | دایمند کالا`;
+  // no manual "| دایمند کالا" suffix here — the root layout's title
+  // template already appends it to every page automatically. Adding it
+  // here too was producing "... | دایمند کالا | دایمند کالا" in Search
+  // Console and search results.
+  const title = product.name;
   const description = product.description?.slice(0, 160) || `خرید ${product.name} از فروشگاه دایمند کالا`;
   const inStock = (product.stock ?? 0) > 0;
 
   return {
     title,
     description,
+    // tells Google unambiguously which single URL is the real one for this
+    // product — fixes "Duplicate without user-selected canonical"
+    alternates: { canonical: `/product/${product._id}` },
     openGraph: {
       title,
       description,

@@ -20,7 +20,13 @@ const mono = JetBrains_Mono({
   weight: ["400", "600"],
 });
 
+const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "https://diamondkalashop.ir";
+
 export const metadata = {
+  // required for relative canonical/OG URLs (used below and in every page's
+  // generateMetadata) to resolve into full, absolute https:// links — Next
+  // can't build a proper canonical tag without knowing the site's real origin
+  metadataBase: new URL(baseUrl),
   title: {
     default: "دایمند کالا | فروشگاه آنلاین لوازم آرایشی و بهداشتی",
     template: "%s | دایمند کالا",
